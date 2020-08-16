@@ -1,0 +1,41 @@
+---
+- name: Install zstd
+  apt:
+    name: zstd
+  become: yes
+  become_user: root
+
+- name: Register snapshot URL
+  shell: echo {{ snapshot_base_url }}/{{ snapshot_file }}
+  args: 
+    executable: /bin/bash
+  register: snapshot_url
+
+- name: Downloading latest {{ name }} snapshot from {{ snapshot_provider }}
+  get_url:
+    url: '{{ snapshot_url.stdout }}'
+    dest: '{{ working_dir }}/snapshots/snapshot.bin.zst'
+    force: yes
+
+- name: Unarchiving snapshot.bin.zst
+  shell: zstd -df snapshot.bin.zst
+  become: yes
+  args:
+    executable: /bin/bash
+    chdir: '{{ working_dir }}/snapshots'
+
+- name: Delete nodeos state to prepare snapshot use
+  file:
+    path: '{{ working_dir }}/deploy/data/state'
+    state: absent
+
+- name: Delete blocks to prepare snapshot use
+  file:
+    path: '{{ working_dir }}/deploy/data/blocks'
+    state: absent
+
+- name: Register snapshot file
+  shell: "ls -t {{ working_dir }}/snapshots/snapshot*.bin | head -n1"
+  args:
+    executable: /bin/bash
+  register: snapshot_bin

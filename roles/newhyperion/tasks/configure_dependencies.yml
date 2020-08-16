@@ -1,0 +1,101 @@
+---
+
+- name: Get apt key dependencies
+  apt_key: url={{ item }}
+  with_items:
+    - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+    - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    - https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  
+- name: Add apt repositories
+  apt_repository: repo={{ item }} 
+  with_items:
+    - deb http://www.rabbitmq.com/debian/ testing main
+    - deb https://deb.nodesource.com/node_13.x bionic main
+    - deb-src https://deb.nodesource.com/node_13.x bionic main
+    - deb https://artifacts.elastic.co/packages/7.x/apt stable main
+  update_cache: yes
+
+- name: Install Hyperion-History-API dependencies
+  apt: 
+    name:
+      - default-jre
+      - apt-transport-https
+      - elasticsearch
+      - rabbitmq-server
+      - redis-server
+      - nodejs
+      - kibana
+    state: latest
+    update_cache: yes
+
+- name: Install PM2
+  npm:
+    name: pm2@latest
+    global: yes
+
+- name: Start PM2
+  command: pm2 startup
+  args:
+    creates: /etc/systemd/system/pm2-root.service
+
+- name: Configure ES memlock
+  blockinfile:
+    path: '{{ es_override_path }}'
+    create: yes
+    block: |
+      [Service]
+      LimitMEMLOCK=infinity
+
+- name: Enable elasticsearch service
+  service:
+    name: elasticsearch
+    state: restarted
+    enabled: yes
+
+- name: Enables the rabbitmq_management plugin
+  rabbitmq_plugin:
+    names: rabbitmq_management
+    state: enabled
+
+# Ensure that the vhost /test exists.
+- name: Create rabbitmq vhost
+  rabbitmq_vhost:
+    name: /hyperion
+    state: present
+
+# Add user to server and assign full access control on / vhost.
+# The user doesn't have permission rules for other vhosts
+- rabbitmq_user:
+    user: '{{ rabbitmq_user }}'
+    password: '{{ rabbitmq_password }}'
+    tags: administrator
+    permissions:
+      - vhost: /hyperion
+        configure_priv: .*
+        read_priv: .*
+        write_priv: .*
+    state: present
+
+- name: Configure Redis
+  lineinfile:
+    path: '{{ redis_conf_path }}'
+    regexp: '^supervised'
+    line: supervised systemd
+
+- name: Enable redis service
+  service:
+    name: redis
+    state: restarted
+    enabled: yes
+
+- name: Configure Kibana
+  shell: sudo sed -ie 's/#elasticsearch.password: "pass"/elasticsearch.password: '"{{ hyp_es_api_basic_auth_password }}"'/; s/#elasticsearch.username: "kibana"/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
+  args:
+    executable: /bin/bash
+
+- name: Enable kibana service
+  service:
+    name: kibana
+    state: restarted
+    enabled: yes

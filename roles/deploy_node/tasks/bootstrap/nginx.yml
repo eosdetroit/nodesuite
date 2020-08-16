@@ -1,0 +1,24 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+  when: setup_nginx
+
+- name: Setup nginx vhost conf
+  template:
+    src: eosio-vhost.conf.j2
+    dest: /etc/nginx/sites-enabled/eosio-vhost.conf
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+
+- name: Add apt repositories
+  apt_repository:
+    repo: ppa:certbot/certbot
+
+- name: Install certbot
+  apt:
+    name: python-certbot-nginx

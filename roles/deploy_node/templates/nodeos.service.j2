@@ -1,0 +1,13 @@
+[Unit]
+Description=Nodeos Service
+After=network.target
+
+[Service]
+User={{ deploy_user }}
+Restart=always
+Type=forking
+WorkingDirectory={{ working_dir}}/deploy
+ExecStart={{ working_dir }}/deploy/start.sh
+
+[Install]
+WantedBy=multi-user.target

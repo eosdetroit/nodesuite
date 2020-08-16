@@ -1,0 +1,43 @@
+# This is a sample config.toml document for EOSIO DSPs
+
+[dsp]
+# enter account
+account = "{{ producer_name }}"
+# enter account private key
+private_key = "{{ dsp_private_key }}"
+port = {{ http_proxy_port }}
+# configure available services: (comment for all services)
+# services_enabled = "ipfs,log,vaccounts,oracle,cron,readfn,auth,storage,history,sign"
+# account_permissions = "active"
+
+[database]
+# url syntax: postgres://postgres@example.com:5432/dbname
+url = "postgres://postgres@localhost:5432/{{ dsp_db_name }}"
+
+# production (uses above url for database)
+node_env = "production"
+
+[nodeos]
+host = "localhost"
+port = {{ http_server_port }}
+secured = false
+
+# EOS mainnet:
+chainid = "aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906"
+# kylin: "5fff1dae8dc8e2fc4d5b23b2c7665c97f9e9d8edf2b6485a86ba311c25639191"
+
+# if using state_history_plugin:
+websocket_port = {{ state_history_server_port }}
+host_dsp = "localhost"
+host_dsp_port = 3115
+
+[demux]
+backend = "state_history_plugin"
+socket_mode = "sub"
+# head block to sync demux from
+head_block = 87161440
+
+[ipfs]
+protocol = "http"
+host = "localhost"
+port = 5001

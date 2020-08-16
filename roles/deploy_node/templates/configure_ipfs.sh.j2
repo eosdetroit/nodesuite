@@ -1,0 +1,49 @@
+ipfs init
+ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001
+ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
+
+cat <<EOF > /lib/systemd/system/ipfs.service
+[Unit]
+Description=IPFS daemon
+After=network.target
+[Service]
+ExecStart=/usr/local/bin/ipfs daemon
+Restart=always
+[Install]
+WantedBy=multiuser.target
+EOF
+
+systemctl start ipfs
+systemctl enable ipfs
+
+# Liquidapps bootstrap peer
+ipfs bootstrap add /ip4/35.170.64.183/tcp/4001/ipfs/QmZpyMnBJKwyPJNBUYVuCZEJuKQBEwM6qVHsSp179B3yao
+
+# Liquidapps swarm peer
+ipfs swarm connect /ip4/35.170.64.183/tcp/4001/ipfs/QmZpyMnBJKwyPJNBUYVuCZEJuKQBEwM6qVHsSp179B3yao
+ipfs swarm connect /ip4/18.212.96.94/tcp/4001/ipfs/QmZ5gLTZwvfD5DkbbaFFX4YJCi7f4C5oQAgq8qpjL8S1ur
+ipfs swarm connect /ip4/18.212.76.109/tcp/4001/ipfs/QmcCX4b3EF3eXaDe5dgxTL9mXbyci4FwcJAjWqpub5vCXM
+
+
+# services used to reconnect to ipfs periodically
+
+cat <<EOF > /lib/systemd/system/gateway-connector.service
+[Unit]
+Description=Job that periodically connects this IPFS node to the gateway node
+[Service]
+ExecStart=/usr/local/bin/ipfs swarm connect /ip4/18.212.96.94/tcp/4001/ipfs/QmZ5gLTZwvfD5DkbbaFFX4YJCi7f4C5oQAgq8qpjL8S1ur /ip4/18.212.76.109/tcp/4001/ipfs/QmcCX4b3EF3eXaDe5dgxTL9mXbyci4FwcJAjWqpub5vCXM /ip4/35.170.64.183/tcp/4001/ipfs/QmZpyMnBJKwyPJNBUYVuCZEJuKQBEwM6qVHsSp179B3yao
+Environment="IPFS_PATH=/root/.ipfs"
+EOF
+
+cat <<EOF > /lib/systemd/system/gateway-connector.timer
+[Unit]
+Description=Timer that periodically triggers gateway-connector.service
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=1min
+[Install]
+WantedBy=timers.target
+EOF
+
+sudo systemctl enable gateway-connector.timer
+sudo systemctl start gateway-connector.timer

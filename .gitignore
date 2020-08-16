@@ -1,0 +1,12 @@
+.vagrant
+*.retry
+.DS_store
+*console.log
+.vscode
+backup
+_backup*
+group_vars
+host_vars
+stage_vars
+inventories
+.private/*

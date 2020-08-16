@@ -1,0 +1,76 @@
+---
+- name: Install DSP dependencies
+  apt: 
+    name:
+      - golang-go
+      - postgresql
+      - postgresql-contrib
+      - python-psycopg2
+      - nodejs
+      - npm
+    state: present
+    update_cache: yes
+
+- name: Install IPFS
+  unarchive:
+    remote_src: yes
+    src: '{{ ipfs_dist_url }}/{{ ipfs_version }}/go-ipfs_{{ ipfs_version }}_linux-amd64.tar.gz'
+    dest: '{{ working_dir }}/dist'
+  
+- name: Move IPFS archive
+  command: mv {{ working_dir }}/dist/go-ipfs/ipfs /usr/local/bin/ipfs
+
+- name: setup ipfs script
+  template:
+    src: configure_ipfs.sh.j2
+    dest: '{{ working_dir }}/deploy/configure_ipfs.sh'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Configure IPFS
+  shell: '{{ working_dir}}/deploy/configure_ipfs.sh'
+  args:
+    executable: /bin/bash
+    chdir: '{{ working_dir }}'
+
+- name: Create postgres DB
+  postgresql_db:
+    name: '{{ dsp_db_name }}'
+  become_user: postgres
+  become: yes
+
+- name: Install PM2
+  npm:
+    name: pm2@latest
+    global: yes
+
+- name: Start PM2
+  command: pm2 startup
+  args:
+    creates: /etc/systemd/system/pm2-root.service
+
+- name: Install DSP
+  npm:
+    name: "@liquidapps/dsp"
+    global: yes
+    unsafe_perm: yes
+
+- name: Make dsp config directory
+  file:
+    path: ~/.dsp
+    state: directory
+
+- name: Install dsp config
+  template:
+    src: dsp/config.toml.j2
+    dest: ~/.dsp/config.toml
+
+- name: Load DSP config
+  command: setup-dsp
+
+- name: Enable DSP service
+  service:
+    name: dsp
+    state: restarted
+    enabled: yes

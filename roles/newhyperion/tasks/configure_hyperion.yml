@@ -1,0 +1,62 @@
+---
+- name: Checking out Hyperion History API
+  git:
+    repo: '{{ api_git_repo }}'
+    clone: yes
+    dest: '{{ working_dir }}/src/Hyperion-History-API'
+    version: '{{ hyperion_version }}'
+    recursive: yes
+    force: yes
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Install Hyperion-History-API
+  npm:
+    path: '{{ working_dir }}/src/Hyperion-History-API'
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Configure Hyperion API
+  template:
+    src: ecosystem.config.js.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/ecosystem.config.js'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Configure Hyperion connections.json
+  template:
+    src: connections.json.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/connections.json'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Configure Hyperion {{ name}}.config.json
+  template:
+    src: config.json.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/chains/{{ name }}.config.json'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Make logs directory
+  file:
+    path: '{{ working_dir }}/src/Hyperion-History-API/logs/{{ name }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Start Hyperion Indexer
+  command: pm2 start --only {{ name }}-indexer --update-env
+  args:
+    chdir: '{{ working_dir }}/src/Hyperion-History-API'
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Start Hyperion API
+  command: pm2 start --only {{ name }}-api --update-env
+  args:
+    chdir: '{{ working_dir }}/src/Hyperion-History-API'
+  become: yes
+  become_user: '{{ deploy_user }}'

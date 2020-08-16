@@ -1,0 +1,98 @@
+{
+  "api": {
+    "chain_name": "{{ name }}",
+    "server_addr": "127.0.0.1",
+    "server_port":  {{ http_proxy_port }},
+    "server_name": "{{ api_endpoint }}",
+    "provider_name": "{{ agent_name }}",
+    "provider_url": "{{ provider_website }}",
+    "chain_logo_url": "{{ hyp_chain_logo_url }}/{{ name }}.png",
+    "enable_caching": {{ hyp_api_enable_caching | lower }},
+    "cache_life": 1,
+    "limits": {
+      "get_actions": 1000,
+      "get_voters": 100,
+      "get_links": 1000,
+      "get_deltas": 1000
+    },
+    "access_log": false,
+    "enable_explorer": false
+  },
+  "settings": {
+    "preview": {{ hyp_preview_mode | lower }},
+    "chain": "{{ name }}",
+    "eosio_alias": "eosio",
+    "parser": "1.8",
+    "auto_stop": 300,
+    "index_version": "v1",
+    "debug": {{ hyp_debug_mode | lower }},
+    "rate_monitoring": true,
+    "bp_logs": false,
+    "bp_monitoring": false,
+    "ipc_debug_rate": 60000,
+    "allow_custom_abi": false
+  },
+  "blacklists": {
+    "actions": [],
+    "deltas": [],
+    "max_depth": 10,
+    "root_only": false
+  },
+  "whitelists": {
+    "actions": [],
+    "deltas": []
+  },
+  "scaling": {
+    "readers": {{ hyp_readers }},
+    "ds_queues": {{ hyp_deserializer_queues }},
+    "ds_threads": {{ hyp_deserializer_threads }},
+    "ds_pool_size": 1,
+    "indexing_queues": {{ hyp_es_indexing_queues }},
+    "ad_idx_queues": {{ hyp_es_ad_indexing_queues }},
+    "max_autoscale": 4,
+    "batch_size": 10000,
+    "resume_trigger": 5000,
+    "auto_scale_trigger": 20000,
+    "block_queue_limit": 100000,
+    "max_queue_limit": 50000,
+    "routing_mode": "heatmap",
+    "polling_interval": 10000
+  },
+  "indexer": {
+    "start_on": {{ hyp_start_block }},
+    "stop_on": {{ hyp_stop_block }},
+    "rewrite": {{ hyp_rewrite_mode | lower }},
+    "purge_queues": {{ hyp_purge_queues | lower }},
+    "live_reader": {{ hyp_live_reader | lower }},
+    "live_only_mode": {{ hyp_live_only_mode | lower }},
+    "abi_scan_mode": {{ hyp_abi_scan_mode | lower }},
+    "fetch_block": {{ hyp_fetch_block | lower }},
+    "fetch_traces": {{ hyp_fetch_traces | lower }},
+    "disable_reading": {{ hyp_disable_reading | lower }},
+    "disable_indexing": {{ hyp_disable_indexing | lower }},
+    "process_deltas": {{ hyp_process_deltas | lower }},
+    "max_inline": {{ hyp_max_inline }}
+  },
+  "features": {
+    "streaming": {
+      "enable": false,
+      "traces": false,
+      "deltas": false
+    },
+    "tables": {
+      "proposals": true,
+      "accounts": true,
+      "voters": true,
+      "userres": false,
+      "delband": false
+    },
+    "index_deltas": true,
+    "index_transfer_memo": true,
+    "index_all_deltas": true
+  },
+  "prefetch": {
+    "read": 50,
+    "block": 100,
+    "index": 500
+  }
+}

@@ -1,0 +1,77 @@
+- name: Install aptitude
+  raw: apt-get -y install aptitude
+
+- name: upgrade packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+
+- name: Make sure we have a 'wheel' group
+  group:
+    name: wheel
+    state: present
+
+- name: Allow wheel group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%wheel'
+    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+
+- name: Create deploy user with sudo access.
+  user: 
+    name: '{{ deploy_user }}' 
+    groups: wheel 
+    append: yes
+    state: present 
+    createhome: yes
+    shell: /bin/bash
+
+- name: Restart sshd
+  service:
+    name: sshd
+    enabled: yes
+    state: restarted
+
+- name: Create working directory
+  file:
+    path: '{{ working_dir }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Find block storage mount
+  find:
+    paths: '/mnt'
+    recurse: no
+    file_type: directory
+  register: mount_dir
+  when: setup_block_storage | bool
+
+- name: Linking working directory to block storage
+  file:
+    src: '{{ mount_dir.files[0].path }}'
+    path: '{{ working_dir }}'
+    state: link
+    force: yes
+  when: setup_block_storage | bool and mount_dir.files[0] is defined
+
+- name: Create sub directories
+  file:
+    path: '{{ working_dir }}/{{ item }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+  loop:
+    - src
+    - deploy
+    - versions
+    - backups
+    - snapshots
+    - vendor
+    - dist
+    - cron
+
+- name: Tune CPU params
+  include: tune_cpu.yml
+  when: tune_cpu | bool

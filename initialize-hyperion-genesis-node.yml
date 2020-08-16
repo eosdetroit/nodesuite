@@ -1,0 +1,33 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: root
+  gather_facts: no
+  pre_tasks:
+     - raw: sudo apt-get update && sudo apt-get -y install python
+  roles:
+    - { role: initialize_system }
+
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: '{{ deploy_user }}'
+  vars:
+    use_genesis_json: yes
+  vars_files:
+    - stage_vars/{{ name }}/{{ stage }}/vars.yml
+    - stage_vars/{{ name }}/{{ stage }}/vault.yml
+  roles:
+    - { role: build_source }
+    - { role: deploy_node }
+
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: root
+  vars_files:
+    - stage_vars/{{ name }}/{{ stage }}/vars.yml
+    - stage_vars/{{ name }}/{{ stage }}/vault.yml
+  roles:
+    - { role: hyperion, when: setup_hyperion | bool }

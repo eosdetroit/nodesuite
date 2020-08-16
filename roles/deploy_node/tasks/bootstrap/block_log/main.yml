@@ -1,0 +1,9 @@
+---
+- name: Checking if block log archive is downloaded
+  stat:
+    path: '{{ working_dir }}/backups/{{ block_log_file }}'
+  register: has_block_log_archive
+
+- name: Download blocks
+  include: dl_blocks.yml
+  when: has_block_log_archive.stat.exists == False

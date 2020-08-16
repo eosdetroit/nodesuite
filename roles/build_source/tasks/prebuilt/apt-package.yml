@@ -1,0 +1,53 @@
+---
+- name: Install system dependencies
+  apt:
+    name: software-properties-common
+
+- name: Get apt key dependencies
+  apt_key: 
+    url: '{{ pkg_gpg_key }}'
+
+- name: Add apt repositories
+  apt_repository: 
+    repo: '{{ pkg_apt_repo }}'
+
+- name: Install {{ package }}
+  apt: 
+    name: '{{ package }}'
+    state: latest
+    update_cache: yes
+
+- name: Check version directly
+  command: '{{ pkg_install_path }}/{{ nodeos_bin }} --version'
+  register: nodeos_version
+  ignore_errors: true
+
+- name: Massage version 
+  set_fact:
+    version: '{{ nodeos_version.stdout }}'
+
+- name: Preparing to version programs
+  file:
+    path: '{{ working_dir }}/versions/{{ version }}/{{ item }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+  loop:
+    - '{{ nodeos_bin }}'
+    - '{{ cli_bin }}'
+    - '{{ keosd_bin }}'
+
+- name: Versioning programs
+  copy:
+    remote_src: yes
+    src: '{{ pkg_install_path }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}/{{ item }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    mode: u+rwx
+  become: yes
+  become_user: root
+  loop:
+    - '{{ nodeos_bin }}'
+    - '{{ cli_bin }}'
+    - '{{ keosd_bin }}'

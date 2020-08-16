@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: arhag <arhag@users.noreply.github.com>
+Date: Wed, 15 Apr 2020 21:29:41 -0400
+Subject: [PATCH] bump version to 2.0.4-patch1
+
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 57894e10c..91368d021 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -26,7 +26,7 @@ set( CXX_STANDARD_REQUIRED ON)
+ set(VERSION_MAJOR 2)
+ set(VERSION_MINOR 0)
+ set(VERSION_PATCH 4)
+-#set(VERSION_SUFFIX rc3)
++set(VERSION_SUFFIX patch1)
+ 
+ if(VERSION_SUFFIX)
+     set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
+
+base-commit: b39b6bd3c74ff47fc53fa80aafa2c1941ba82879
+-- 
+2.21.1 (Apple Git-122.3)
+

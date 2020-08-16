@@ -1,0 +1,40 @@
+---
+- name: Install jq
+  apt:
+    name: jq
+  become: yes
+  become_user: root
+
+- name: Setup claims wallet
+  include_tasks:
+    file: wallet.yml
+  vars:
+    wallet_name: '{{ claims_wallet_name }}'
+    wallet_private_key: '{{ claims_private_key }}'
+
+- name: Template claims script
+  template:
+    src: 'claim_rewards.sh.j2'
+    dest: '{{ working_dir }}/cron/claim_rewards.sh'
+    mode: u+rwx
+
+- name: Slurp up claims wallet pw
+  slurp:
+    src: ~/{{ claims_wallet_name }}.pw
+  register: claimspw
+
+- name: Install claims script cron
+  cron:
+    name: claim rewards
+    job: "{{ working_dir }}/cron/claim_rewards.sh {{ claimspw['content'] | b64decode }} >> {{ working_dir }}/cron/{{ claims_wallet_name }}.log"
+    user: "{{ deploy_user }}"
+  when: name != "telos"
+
+- name: Install claims script cron on Telos
+  cron:
+    name: claim rewards
+    job: "{{ working_dir }}/cron/claim_rewards.sh {{ claimspw['content'] | b64decode }} >> {{ working_dir }}/cron/{{ claims_wallet_name }}.log"
+    user: "{{ deploy_user }}"
+    hour: 16
+    minute: 30
+  when: name == "telos"

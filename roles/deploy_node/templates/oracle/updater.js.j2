@@ -1,0 +1,63 @@
+const { Api, JsonRpc, RpcError } = require('eosjs');
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');
+const fetch = require('node-fetch');                                    // node only; not needed in browsers
+const { TextEncoder, TextDecoder } = require('util');                   // node only; native TextEncoder/Decoder
+const request = require('request');
+
+
+const oracleContract = "{{ oracle_contract }}";
+const defaultPrivateKey = "{{ oracle_private_key }}"; // bob
+const signatureProvider = new JsSignatureProvider([defaultPrivateKey]);
+const rpc = new JsonRpc('{{ oracle_rpc_endpoint }}', { fetch });
+const api = new Api({ rpc, signatureProvider, textDecoder: new TextDecoder(), textEncoder: new TextEncoder() });
+const BITTREX_API_BASE_URL = 'https://api.bittrex.com/v3';
+const BITTREX_TICKERS_URL = BITTREX_API_BASE_URL + '/markets/tickers';
+const MARKET_SYMBOLS = ['WAXP-BTC', 'WAXP-USD'];
+const PRECISION_MULTIPLIER = {
+    'WAXP-BTC': 100000000,
+    'WAXP-USD': 10000
+}
+
+function write() {
+    request.get(BITTREX_TICKERS_URL, function (err, res, data) {
+        let quotes = []
+        console.log(JSON.parse(data));
+        for (const market of JSON.parse(data)) {
+            if (MARKET_SYMBOLS.includes(market['symbol'])) {
+                const lastTradeRate = parseFloat(market['lastTradeRate']);
+                const bidRate = parseFloat(market['bidRate']);
+                const askRate = parseFloat(market['askRate']);
+                const price = Math.round(((lastTradeRate + bidRate + askRate) / 3) * PRECISION_MULTIPLIER[market['symbol']]);
+                quote = {
+                    value: price,
+                    pair: market['symbol'].replace('-','').toLowerCase()
+                }
+                quotes.push(quote);
+            }
+        }
+        console.log(quotes);
+        (async () => {
+            const result = await api.transact({
+                actions: [{
+                    account: oracleContract,
+                    name: 'write',
+                    authorization: [{
+                        actor: '{{ producer_name }}',
+                        permission: '{{ oracle_permission }}',
+                    }],
+                    data: {
+                        quotes: quotes,
+                        owner: '{{ producer_name }}'
+                    },
+                }]
+                },
+                {
+                    blocksBehind: 3,
+                    expireSeconds: 30,
+                });
+            console.dir(result);
+        })();
+    });
+}
+
+write();

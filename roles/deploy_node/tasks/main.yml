@@ -1,0 +1,104 @@
+---
+- name: Checking if version is built
+  stat:
+    path: '{{ working_dir }}/versions/{{ version }}'
+  register: has_version
+
+- block:
+  - name: "End play on host if version not present"
+    debug:
+      msg: "Target deploy version not present, ending play on host"
+  - meta: end_host
+  when: has_version.stat.exists == False
+
+- name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
+  file:
+    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}/{{ nodeos_bin }}'
+    path: '{{ working_dir }}/deploy/nodeos'
+    state: link
+    force: yes
+
+- name: Linking {{ cli_bin }} {{ version }} into dist directory
+  file:
+    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}/{{ cli_bin }}'
+    path: '{{ working_dir }}/dist/{{ cli_bin }}'
+    state: link
+    force: yes
+
+- name: Creating config.ini file
+  template:
+    src: 'config.ini.j2'
+    dest: '{{ working_dir }}/deploy/config.ini'
+    backup: yes
+    mode: u=rw
+
+- include: snapshot/{{ snapshot_provider }}.yml
+  when: use_snapshot | bool
+
+- include: bootstrap/block_log/main.yml
+  when: dl_block_log | bool
+
+- name: Installing nodeos start script
+  template:
+    src: 'start.sh.j2'
+    dest: '{{ working_dir }}/deploy/start.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos service config
+  template:
+    src: 'nodeos.service.j2'
+    dest: '/etc/systemd/system/nodeos.service'
+  become: yes
+  become_user: root
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+  become_user: root
+
+- include: genesis.yml
+  when: use_genesis_json | bool
+
+- name: Starting nodeos
+  service:
+    name: nodeos
+    enabled: yes
+    state: restarted
+  become: yes
+  become_user: root
+
+- name: Clearing nodeos flags on start.sh
+  template:
+    src: 'start.sh.j2'
+    dest: '{{ working_dir }}/deploy/start.sh'
+    mode: u+rwx
+    force: yes
+  vars:
+    do_replay: no
+    use_snapshot: no
+    use_genesis_json: no
+    setup_mongo: no
+
+- include: bootstrap/mongo.yml
+  when: setup_mongo | bool
+
+- include: bootstrap/claims.yml
+  when: setup_claims | bool
+
+- include: bootstrap/nginx.yml
+  when: setup_nginx | bool
+  become: yes
+  become_user: root
+
+- include: bootstrap/dsp.yml
+  when: setup_dsp | bool
+  become: yes
+  become_user: root
+
+- include: bootstrap/oracle.yml
+  when: setup_oracle | bool
+
+- include: bootstrap/oig.yml
+  when: setup_oig | bool

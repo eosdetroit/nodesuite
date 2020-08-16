@@ -1,0 +1,11 @@
+---
+- name: Checking if version is built
+  stat:
+    path: '{{ working_dir }}/versions/{{ version }}'
+  register: has_version
+
+- include: prebuilt.yml
+  when: prebuilt | bool
+
+- include: build.yml
+  when: (has_version.stat.exists == False and not prebuilt | bool) or force_build | bool

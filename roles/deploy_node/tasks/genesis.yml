@@ -1,0 +1,5 @@
+---
+- name: Install {{ name }} {{ stage }} genesis.json
+  copy:
+    src: '{{ name }}/{{ stage }}/genesis.json'
+    dest: '{{ genesis_json_path }}'

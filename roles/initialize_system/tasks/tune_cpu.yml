@@ -1,0 +1,24 @@
+---
+- name: Install cpufrequtils
+  apt:
+    name: cpufrequtils
+
+- name: Set GRUB boot settings
+  lineinfile:
+    path: '{{ grub_default_path }}'
+    regexp: '^GRUB_CMDLINE_LINUX='
+    line: GRUB_CMDLINE_LINUX="cpuidle.off=1 processor.ignore_ppc=1 processor.max_cstate=0 intel_idle.max_cstate=0 intel_pstate=enable"
+
+- name: Configure cpufrequtils
+  template:
+    src: 'cpufrequtils.j2'
+    dest: '{{ cpufrequtils_default_path }}'
+
+- name: Reboot host and wait for it to restart
+  reboot:
+    msg: "Reboot initiated by Ansible"
+    connect_timeout: 5
+    reboot_timeout: 600
+    pre_reboot_delay: 0
+    post_reboot_delay: 30
+    test_command: whoami

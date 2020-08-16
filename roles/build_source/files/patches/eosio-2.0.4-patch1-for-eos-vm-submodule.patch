@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Steven Watanabe <steven.watanabe@block.one>
+Date: Wed, 15 Apr 2020 14:51:58 -0400
+Subject: [PATCH] EOS VM allocator security fix
+
+---
+ include/eosio/vm/allocator.hpp         | 14 +++++++++-----
+ include/eosio/vm/backend.hpp           |  4 ----
+ include/eosio/vm/execution_context.hpp |  8 +++++---
+ 3 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/include/eosio/vm/allocator.hpp b/include/eosio/vm/allocator.hpp
+index a8aacc6..f5e1550 100644
+--- a/include/eosio/vm/allocator.hpp
++++ b/include/eosio/vm/allocator.hpp
+@@ -409,6 +409,10 @@ namespace eosio { namespace vm {
+          raw += syspagesize;
+          page = 0;
+       }
++      // Initializes the memory controlled by the allocator.
++      //
++      // \post get_current_page() == new_pages
++      // \post all allocated pages are zero-filled.
+       void reset(uint32_t new_pages) {
+          if (page != -1) {
+             memset(raw, '\0', page_size * page); // zero the memory
+@@ -416,13 +420,13 @@ namespace eosio { namespace vm {
+             std::size_t syspagesize = static_cast<std::size_t>(::sysconf(_SC_PAGESIZE));
+             int err = mprotect(raw - syspagesize, syspagesize, PROT_READ);
+             EOS_VM_ASSERT(err == 0, wasm_bad_alloc, "mprotect failed");
++            page = 0;
+          }
+-         // no need to mprotect if the size hasn't changed
+-         if (new_pages != page && page > 0) {
+-            int err = mprotect(raw, page_size * page, PROT_NONE); // protect the entire region of memory
+-            EOS_VM_ASSERT(err == 0, wasm_bad_alloc, "mprotect failed");
++         if(new_pages > page) {
++            alloc<char>(new_pages - page);
++         } else if(new_pages < page) {
++            free<char>(page - new_pages);
+          }
+-         page = 0;
+       }
+       // Signal no memory defined
+       void reset() {
+diff --git a/include/eosio/vm/backend.hpp b/include/eosio/vm/backend.hpp
+index 21f99de..27b8dc3 100644
+--- a/include/eosio/vm/backend.hpp
++++ b/include/eosio/vm/backend.hpp
+@@ -61,10 +61,6 @@ namespace eosio { namespace vm {
+       }
+ 
+       inline backend& initialize(Host* host=nullptr) {
+-         if(_mod.memories.size())
+-            _walloc->reset(_mod.memories[0].limits.initial);
+-         else
+-            _walloc->reset();
+          _ctx.reset();
+          _ctx.execute_start(host, interpret_visitor(_ctx));
+          return *this;
+diff --git a/include/eosio/vm/execution_context.hpp b/include/eosio/vm/execution_context.hpp
+index d1a4340..3555a32 100644
+--- a/include/eosio/vm/execution_context.hpp
++++ b/include/eosio/vm/execution_context.hpp
+@@ -64,9 +64,11 @@ namespace eosio { namespace vm {
+          EOS_VM_ASSERT(_mod.error == nullptr, wasm_interpreter_exception, _mod.error);
+ 
+          _linear_memory = _wasm_alloc->get_base_ptr<char>();
+-         if (_mod.memories.size()) {
+-            grow_linear_memory(_mod.memories[0].limits.initial - _wasm_alloc->get_current_page());
+-         }
++         if(_mod.memories.size()) {
++            if(_mod.memories[0].limits.initial <= max_pages)
++               _wasm_alloc->reset(_mod.memories[0].limits.initial);
++         } else
++            _wasm_alloc->reset();
+ 
+          for (uint32_t i = 0; i < _mod.data.size(); i++) {
+             const auto& data_seg = _mod.data[i];
+
+base-commit: c5afecd4705317e28d97eb0d950dc50ea1bb58c7
+-- 
+2.21.1 (Apple Git-122.3)
+

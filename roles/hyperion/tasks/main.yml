@@ -1,0 +1,173 @@
+---
+- name: Checking out Hyperion History API
+  git:
+    repo: '{{ api_git_repo }}'
+    clone: yes
+    dest: '{{ working_dir }}/src/Hyperion-History-API'
+    version: '{{ hyperion_version }}'
+    recursive: yes
+    force: yes
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+
+# - name: Get apt key dependencies
+#   apt_key: url={{ item }}
+#   with_items:
+#     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+  
+# - name: Get apt key dependencies
+#   apt_key: url={{ item }}
+#   with_items:
+#     - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
+#     - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+  
+# - name: Add apt repositories
+#   apt_repository: repo={{ item }} 
+#   with_items:
+#     - deb http://www.rabbitmq.com/debian/ testing main
+#     - deb https://deb.nodesource.com/node_13.x bionic main
+#     - deb-src https://deb.nodesource.com/node_13.x bionic main
+
+# - name: Install Hyperion-History-API dependencies
+#   apt: 
+#     name:
+# #      - default-jre
+# #      - apt-transport-https
+# #      - rabbitmq-server
+# #      - redis-server
+#       - nodejs
+#     state: latest
+#     update_cache: yes
+
+# - name: Install PM2
+#   npm:
+#     name: pm2@latest
+#     global: yes
+
+# - name: Start PM2
+#   command: pm2 startup
+#   args:
+#     creates: /etc/systemd/system/pm2-root.service
+# - name: Enables the rabbitmq_management plugin
+#   rabbitmq_plugin:
+#     names: rabbitmq_management
+#     state: enabled
+
+# # Ensure that the vhost /test exists.
+# - name: Create rabbitmq vhost
+#   rabbitmq_vhost:
+#     name: /hyperion
+#     state: present
+
+# # Add user to server and assign full access control on / vhost.
+# # The user doesn't have permission rules for other vhosts
+# - rabbitmq_user:
+#     user: '{{ rabbitmq_user }}'
+#     password: '{{ rabbitmq_password }}'
+#     tags: administrator
+#     permissions:
+#       - vhost: /hyperion
+#         configure_priv: .*
+#         read_priv: .*
+#         write_priv: .*
+#     state: present
+
+# - name: Configure Redis
+#   lineinfile:
+#     path: '{{ redis_conf_path }}'
+#     regexp: '^supervised'
+#     line: supervised systemd
+
+# - name: Enable redis service
+#   service:
+#     name: redis
+#     state: restarted
+#     enabled: yes
+
+- name: Template Hyperion Dependency Install
+  template:
+    src: install_deps.sh.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/ns_install_deps.sh'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    
+- name: Install Hyperion Dependencies
+  shell: '{{ working_dir }}/src/Hyperion-History-API/ns_install_deps.sh'
+  args:
+    executable: /bin/bash
+    chdir: '{{ working_dir }}'
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Template Elasticsearch/Kibana Install
+  template:
+    src: install_es.sh.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/ns_install_es.sh'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    
+- name: Install Elasticsearch/Kibana
+  shell: '{{ working_dir }}/src/Hyperion-History-API/ns_install_es.sh'
+  args:
+    executable: /bin/bash
+    chdir: '{{ working_dir }}'
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Retrieve auto-generated elasticsearch user credentials. 
+  shell: awk <elastic_pass.txt '/PASSWORD elastic =/ {print $4}'
+  args:
+    chdir: '{{ working_dir }}/src/Hyperion-History-API'
+  register: elastic_pw
+
+- name: Update elasticsearch user credentials.
+  set_fact:
+    es_api_basic_auth_password: '{{ elastic_pw.stdout }}'
+
+- name: Configure Hyperion API
+  template:
+    src: ecosystem.config.js.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/ecosystem.config.js'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Configure Hyperion connections.json
+  template:
+    src: connections.json.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/connections.json'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Configure Hyperion {{ name}}.config.json
+  template:
+    src: config.json.j2
+    dest: '{{ working_dir }}/src/Hyperion-History-API/chains/{{ name }}.config.json'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Make logs directory
+  file:
+    path: '{{ working_dir }}/src/Hyperion-History-API/logs/{{ name }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+# - name: Start Hyperion API
+#   command: pm2 start --only {{ name }}-api --update-env
+#   args:
+#     chdir: '{{ working_dir }}/src/Hyperion-History-API'
+#   become: yes
+#   become_user: '{{ deploy_user }}'
+
+# - name: Start Hyperion Indexer
+#   command: pm2 start --only {{ name }}-indexer --update-env
+#   args:
+#     chdir: '{{ working_dir }}/src/Hyperion-History-API'
+#   become: yes
+#   become_user: '{{ deploy_user }}'

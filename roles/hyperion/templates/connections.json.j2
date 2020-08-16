@@ -1,0 +1,29 @@
+{
+  "amqp": {
+    "host": "127.0.0.1:5672",
+    "api": "127.0.0.1:15672",
+    "user": "{{ rabbitmq_user }}",
+    "pass": "{{ rabbitmq_password }}",
+    "vhost": "{{ rabbitmq_vhost }}"
+  },
+  "elasticsearch": {
+    "host": "127.0.0.1:{{ hyp_es_port }}",
+    "ingest_nodes": ["127.0.0.1:{{ hyp_es_port }}"],
+    "user": "{{ es_api_basic_auth_username }}",
+    "pass": "{{ es_api_basic_auth_password }}"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": "6379"
+  },
+  "chains": {
+    "{{ name }}": {
+      "name": "{{ name }} {{ stage }}",
+      "chain_id": "{{ chain_id }}",
+      "http": "http://{{ http_proxy_ip }}:{{ http_server_port }}", 
+      "ship": "ws://{{ state_history_server_ip }}:{{ state_history_server_port }}",
+      "WS_ROUTER_PORT": 7001,
+      "WS_ROUTER_HOST": "127.0.0.1"
+    }
+  }
+}

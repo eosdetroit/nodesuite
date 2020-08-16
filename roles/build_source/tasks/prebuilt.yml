@@ -1,0 +1,10 @@
+---
+- name: Preparing bin package
+  include: prebuilt/bin.yml
+  when: bin_package | bool
+
+- name: Preparing apt package
+  include: prebuilt/apt-package.yml
+  when: apt_package | bool
+  become: yes
+  become_user: root

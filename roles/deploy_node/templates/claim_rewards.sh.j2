@@ -1,0 +1,86 @@
+#!/bin/bash
+
+###################################################################################################
+#
+# This script will auto claim BP rewards
+#
+# The premise is based on a safe "claim" only account permission
+#
+# Please refer to https://github.com/BlockMatrixNetwork/eos-bp-failover/tree/master/claim-rewards
+# for more info on how to set this up
+#
+# Example call:
+#
+# ./claim_rewards.sh PW5JfDojLFSmMTJfDLwQE5zvE4mjSBDwUpfuZWmws5Ecm4AF2StjW
+#
+# Update SLACK_WEBHOOK if you want to be notified via an incoming webhook
+#
+# Made with <3 by Pete @ Block Matrix
+#
+# See more EOS nerd shenanigans @ https://github.com/BlockMatrixNetwork
+#
+###################################################################################################
+
+# Update these params for your system
+CLEOS={{ working_dir }}/dist/{{ cli_bin }}
+API={{ claims_api_url }}:{{ claims_api_port }}
+PRODUCER={{ producer_name }}
+FIO_ADDRESS={{ bp_fio_address }}
+# Pass in the password so you arent checking it into a repo
+CLAIM_WALLET_PASS=$1
+
+# Only update these params if you know what you are doing
+CLAIM_PERMISSION={{ claim_permission }}
+DIFF_CHECK=86400
+EXEC="$CLEOS -u $API"
+
+# Validate the password format
+if [[ ! $CLAIM_WALLET_PASS =~ ^PW5.* ]]; then
+    echo "Invalid wallet password"
+    exit 1
+fi
+
+{% if name != "telos" %}
+PRODS=$(($EXEC get table eosio eosio producers -l 250) 2>&1)
+for row in $(echo "${PRODS}" | jq -r '.rows' | jq -r '.[] | @base64'); do
+    _jq() {
+        echo ${row} | base64 --decode | jq -r ${1}
+    }
+    PROD_NAME=$(_jq '.owner')
+    if [[ $PROD_NAME == $PRODUCER ]]; then
+        PROD_NEXT_CLAIM_TIME=$(date +%Y-%m-%dT%H:%M:%S -d "$(_jq '.last_claim_time') + 1 day")
+        CURRENT_TIME=$(date +'%Y-%m-%dT%H:%M:%S')
+        echo "NEXT CLAIM TIME: $PROD_NEXT_CLAIM_TIME"
+        echo "CURRENT TIME: $CURRENT_TIME"
+        if [[ $PROD_NEXT_CLAIM_TIME > $CURRENT_TIME ]]; then
+            echo "Not claim time yet"
+            exit 1
+        fi
+    fi
+done
+{% endif %}
+
+# Now we can claim rewards
+$EXEC wallet lock_all
+$EXEC wallet unlock -n $CLAIM_PERMISSION --password $CLAIM_WALLET_PASS
+
+{% if name != "fio" %}
+RESULT=$(($EXEC push action {{ claim_account }} {{ claim_action }} "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+{% else %}
+RESULT=$(($EXEC push action {{ claim_account }} {{ claim_action }} '{"fio_address":"'$FIO_ADDRESS'","actor":"'$PRODUCER'"}' -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+{% endif %}
+# Raw output
+echo "$RESULT"
+
+{% if name == "wax" %}
+RESULT=$(($EXEC push action {{ claim_account }} claimgenesis "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+RESULT=$(($EXEC push action {{ claim_account }} claimgbmvote "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+# Raw output
+echo "$RESULT"
+{% endif %}
+
+# dsp claim hack
+{% if name == "eos" %}
+RESULT=$(($EXEC push action dappservices claimrewards "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION) 2>&1)
+echo "$RESULT"
+{% endif %}

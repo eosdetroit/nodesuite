@@ -1,0 +1,45 @@
+---
+- name: Make sure config dir is owned by {{ deploy_user }}
+  file:
+    path: /home/{{ deploy_user }}/.config
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+  become: yes
+
+- name: Set email git config
+  git_config:
+    name: user.email
+    scope: global
+    value: eosio@eosdtroit.io
+
+- name: Set name git config
+  git_config:
+    name: user.name
+    scope: global
+    value: eosio@eosdetroit.io
+
+- name: Create patches directory if it doesn't exist
+  file:
+    path: "{{ working_dir }}/dist/patches"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+
+- name: Copying patches
+  copy:
+    src: patches/{{ item.name }}
+    dest: "{{ working_dir }}/dist/patches/{{ item.name }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  with_items: "{{ patches }}"
+
+- name: Generate apply_patch script
+  template:
+    src: apply_patch.sh.j2
+    dest: "{{ working_dir }}/dist/apply_patch.sh"
+    mode: u+rwx
+
+- name: Run patch script
+  shell: "{{ working_dir }}/dist/apply_patch.sh"
+  args:
+    executable: /bin/bash

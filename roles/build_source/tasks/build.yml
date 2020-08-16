@@ -1,0 +1,63 @@
+---
+- name: Install build dependencies
+  apt: 
+    name:
+      - clang-8
+    state: latest
+    update_cache: yes
+  become: yes
+  become_user: root
+
+- name: Checking out eosio version {{ version }}
+  git:
+    repo: '{{ git_repo }}'
+    clone: yes
+    dest: '{{ working_dir }}/src/eosio'
+    version: '{{ version }}'
+    recursive: yes
+    accept_hostkey: yes
+    force: yes
+  become: yes
+  become_user: root
+
+- name: Set repo permissions to deploy user
+  file:
+    dest: '{{ working_dir }}/src/eosio'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    recurse: yes
+  become: yes
+  become_user: root
+
+- name: Apply patches
+  include: patch.yml
+  when: apply_patch | bool
+
+- name: Running build script
+  shell: src/eosio/scripts/{{ build_script }}  -y -P -i vendor -s {{ token_symbol | quote }} {{ mongo_flag }} 
+  become: yes
+  args:
+    executable: /bin/bash
+    chdir: '{{ working_dir }}'
+
+- name: Stopping nodeos
+  service:
+    name: nodeos
+    enabled: yes
+    state: stopped
+  become: yes
+  become_user: root
+  ignore_errors: yes
+
+- name: Removing previously built version
+  file:
+    path: "{{ working_dir }}/versions/{{ version }}"
+    state: absent
+  when: force_build | bool
+
+- name: Versioning built programs
+  copy:
+    remote_src: yes
+    src: '{{ working_dir }}/src/eosio/build/programs/'
+    dest: '{{ working_dir }}/versions/{{ version }}'
+    mode: preserve

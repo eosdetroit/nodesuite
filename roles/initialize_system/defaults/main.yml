@@ -1,0 +1,6 @@
+grub_default_path: /etc/default/grub
+cpufrequtils_default_path: /etc/default/cpufrequtils
+cpu_governor: performance
+cpu_min_speed: 4800MHz
+cpu_max_speed: 4800MHz
+tune_cpu:

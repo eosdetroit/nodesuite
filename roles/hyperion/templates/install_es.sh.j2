@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+#variables
+INITIAL_PARAMS="$*"
+ELASTIC=false
+RAM=0
+
+check_ram() {
+  RAM=$(free --giga | awk '/Mem/ {print $2}')
+}
+
+# first check if is installed, after check version
+check_dependencies() {
+  CMD=$(if (dpkg --compare-versions $(dpkg -s elasticsearch 2>/dev/null | awk '/Version/ {print $2}') ge "7.6" 2>/dev/null); then echo true; else echo false; fi)
+  if ("$CMD" = true); then
+    ELASTIC=true
+  elif ("$CMD" = false); then
+    exit 1
+  else
+    echo -e "\n"
+  fi
+}
+
+install_elastic() {
+  sudo apt install -y elasticsearch
+
+  # edit configs
+  sudo sed -ie 's/#cluster.name: my-application/cluster.name: {{ name }}-cluster/; s/#bootstrap.memory_lock: true/bootstrap.memory_lock: true/' /etc/elasticsearch/elasticsearch.yml
+  # set jvm options based on system RAM
+  check_ram
+  if [ "$RAM" -lt 32 ]; then
+    (( RAM=RAM/2 ))
+    sudo sed -ie 's/-Xms1g/-Xms'"$RAM"'g/; s/-Xmx1g/-Xmx'"$RAM"'g/' /etc/elasticsearch/jvm.options
+  else
+    sudo sed -ie 's/-Xms1g/-Xms16g/; s/-Xmx1g/-Xmx16g/' /etc/elasticsearch/jvm.options
+  fi
+
+  sudo bash -c 'echo "xpack.security.enabled: true" >> /etc/elasticsearch/elasticsearch.yml'
+
+  if [ ! -d /etc/systemd/system/elasticsearch.service.d ]; then
+    sudo mkdir -p /etc/systemd/system/elasticsearch.service.d/
+    echo -e "[Service]\nLimitMEMLOCK=infinity" | sudo tee /etc/systemd/system/elasticsearch.service.d/override.conf
+  fi
+  sudo systemctl daemon-reload
+  sudo service elasticsearch start
+  sudo systemctl enable elasticsearch
+
+  echo "y" | sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto | sudo tee /opt/eosio/src/Hyperion-History-API/elastic_pass.txt
+  sudo chmod 777 /opt/eosio/src/Hyperion-History-API/elastic_pass.txt
+}
+
+install_kibana() {
+  echo -e "\n\n\n\n"
+  sudo apt install -y kibana
+
+  KIBANA_PASSWORD=$(awk </opt/eosio/src/Hyperion-History-API/elastic_pass.txt '/PASSWORD kibana =/ {print $4}')
+  sudo sed -ie 's/#elasticsearch.password: "pass"/elasticsearch.password: '"$KIBANA_PASSWORD"'/; s/#elasticsearch.username: "kibana"/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
+
+  sudo systemctl enable kibana
+  sudo systemctl start kibana
+}
+
+#******************
+# End of functions
+#******************
+check_dependencies
+
+if [ "$ELASTIC" = false ]; then
+  install_elastic
+  install_kibana
+fi
+
+printf "
+ _   ___   ______  _____ ____  ___ ___  _   _
+| | | \ \ / /  _ \| ____|  _ \|_ _/ _ \| \ | |
+| |_| |\ V /| |_) |  _| | |_) || | | | |  \| |
+|  _  | | | |  __/| |___|  _ < | | |_| | |\  |
+|_| |_| |_| |_|   |_____|_| \_\___\___/|_| \_|
+Stolen with ♥ from EOS Rio
+"
