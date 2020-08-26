@@ -544,7 +544,8 @@ def configureDefaultsAll(config_path, overwrite):
         'setup_oig: ',
         'nodeos_bin: nodeos',
         'cli_bin: cleos',
-        'keosd_bin: keosd'
+        'keosd_bin: keosd',
+        'testnet_name:'
     ]
 
     f.writelines(defaults)

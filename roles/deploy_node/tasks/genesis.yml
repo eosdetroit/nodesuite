@@ -3,3 +3,10 @@
   copy:
     src: '{{ name }}/{{ stage }}/genesis.json'
     dest: '{{ genesis_json_path }}'
+  when: testnet_name is not defined
+
+- name: Install {{ name }} {{ stage }} genesis.json - {{ testnet_name }}
+  copy:
+    src: '{{ name }}/{{ stage }}/{{ testnet_name }}/genesis.json'
+    dest: '{{ genesis_json_path }}'
+  when: testnet_name is defined
