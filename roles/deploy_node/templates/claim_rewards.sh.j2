@@ -79,6 +79,19 @@ RESULT=$(($EXEC push action {{ claim_account }} claimgbmvote "[\"$PRODUCER\"]" -
 echo "$RESULT"
 {% endif %}
 
+{% if name == "proton" %}
+RESULT=$(($EXEC push action {{ claim_account }} voterclaim "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+STAKE=$(($EXEC get table eosio.token $PRODUCER accounts) 2>&1)
+for row in $(echo "${STAKE}" | jq -r '.rows' | jq -r '.[] | @base64'); do
+    _jq() {
+        echo ${row} | base64 --decode | jq -r ${1}
+    }
+    AMOUNT=$(_jq '.balance')
+    RESULT=$(($EXEC push action {{ claim_account }} stakexpr "[\"$PRODUCER\", \"$PRODUCER\", \"$AMOUNT\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+    echo "$RESULT"
+done
+{% endif %}
+
 # dsp claim hack
 {% if name == "eos" %}
 RESULT=$(($EXEC push action dappservices claimrewards "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION) 2>&1)
