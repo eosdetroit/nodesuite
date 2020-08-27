@@ -9,14 +9,17 @@
     debug:
       msg: "Target deploy version not present, ending play on host"
   - meta: end_host
-  when: has_version.stat.exists == False
-    
+  when: 
+    - has_version.stat.exists == False
+    - not update_configs_only | bool
+
 - name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
   file:
     src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}/{{ nodeos_bin }}'
     path: '{{ working_dir }}/deploy/nodeos'
     state: link
     force: yes
+  when: not update_configs_only | bool
 
 - name: Linking {{ cli_bin }} {{ version }} into dist directory
   file:
@@ -24,7 +27,8 @@
     path: '{{ working_dir }}/dist/{{ cli_bin }}'
     state: link
     force: yes
-
+  when: not update_configs_only | bool
+  
 - name: Creating config.ini file
   template:
     src: 'config.ini.j2'
