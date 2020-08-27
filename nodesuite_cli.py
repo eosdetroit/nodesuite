@@ -777,7 +777,7 @@ def getLoggingConfiguration(key):
 
                     return configureDefaultLogging()
         else:
-            configureDefaultLogging()
+            return configureDefaultLogging()
     except Exception as ex:
         logger.error(ex)
 
