@@ -10,7 +10,7 @@
       msg: "Target deploy version not present, ending play on host"
   - meta: end_host
   when: has_version.stat.exists == False
-
+    
 - name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
   file:
     src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}/{{ nodeos_bin }}'
@@ -33,10 +33,14 @@
     mode: u=rw
 
 - include: snapshot/{{ snapshot_provider }}.yml
-  when: use_snapshot | bool
+  when: 
+    - use_snapshot | bool
+    - not update_configs_only | bool
 
 - include: bootstrap/block_log/main.yml
-  when: dl_block_log | bool
+  when: 
+    - dl_block_log | bool
+    - not update_configs_only | bool
 
 - name: Installing nodeos start script
   template:
@@ -51,7 +55,7 @@
     dest: '/etc/systemd/system/nodeos.service'
   become: yes
   become_user: root
-
+  
 - name: Reload systemd daemon
   systemd:
     daemon_reload: yes
@@ -59,7 +63,9 @@
   become_user: root
 
 - include: genesis.yml
-  when: use_genesis_json | bool
+  when: 
+    - use_genesis_json | bool
+    - not update_configs_only | bool
 
 - name: Starting nodeos
   service:
@@ -83,7 +89,7 @@
 
 - include: bootstrap/mongo.yml
   when: setup_mongo | bool
-
+    
 - include: bootstrap/claims.yml
   when: setup_claims | bool
 
