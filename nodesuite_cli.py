@@ -291,9 +291,7 @@ def defineHosts(inventory):
         else:
             click.echo('Register another host?', nl=False)
             s = confirmationPrompt()
-            print(s)
             if(s == False):
-                print('breaking')
                 break
 
     for host in host_list:
@@ -326,48 +324,36 @@ def defineHosts(inventory):
 def setDefaultGroupVars(base_dir, overwrite):
     config_path = initializeConfig(path.join(base_dir, NodeTypeEnum.producer.name, 'vars.yml'), overwrite)
     f = open(config_path, 'a+')
-    f.write('setup_producer: yes\n')
-    f.write('setup_claims: yes\n')
-    f.write('cpu_effort_percent: 40\n')
-    f.write('last_block_cpu_effort_percent: 25\n')
+    assignDefaultsByGroup(NodeTypeEnum.producer.name, f)
     f.close()
 
     config_path = initializeConfig(path.join(base_dir, NodeTypeEnum.v1_history.name, 'vars.yml'), overwrite)
     f = open(config_path, 'a+')
-    f.write('setup_v1_history: yes\n')
+    assignDefaultsByGroup(NodeTypeEnum.v1_history.name, f)
     f.close()
-
 
     config_path = initializeConfig(path.join(base_dir, NodeTypeEnum.hyperion.name, 'vars.yml'), overwrite)
     f = open(config_path, 'a+')
-    f.write('setup_hyperion: yes\n')
-    f.write('setup_state_history: yes\n')
-    f.write('api_git_repo: https://github.com/eosrio/hyperion-history-api.git\n')
-    f.write('hyperion_version: 3.1.0-beta.4\n')
-    f.write('rabbitmq_password: \'{{ vault_rabbitmq_password }}\'\n')
-    f.write('http_proxy_port: 7000\n')
-    f.write('hyp_es_port: 9200\n')
-    f.write('service_name: hyperionapi\n')
-    f.write('es_master_node: true\n')
-    f.write('es_data_node: false\n')
-    f.write('hyp_es_version: 7.6.2\n')
-    f.write('es_data_dir: /opt/eosio/deploy/elasticsearch\n')
-    f.write('es_conf_path: /etc/elasticsearch/elasticsearch.yml\n')
-    f.write('es_jvm_opts_path: /etc/elasticsearch/jvm.options\n')
-    f.write('es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf\n')
-    f.write('hyp_es_api_basic_auth_username: "elastic"\n')
-    f.write('hyp_es_api_basic_auth_password: \'{{ vault_es_api_basic_auth_password }}\'\n')
-    f.write('hyp_es_enable_xpack: true\n')
-    f.write('jvm_heap_size: 8g\n')
+    assignDefaultsByGroup(NodeTypeEnum.hyperion.name, f)
     f.close()
 
     config_path = initializeConfig(path.join(base_dir, 'nginx', 'vars.yml'), overwrite)
     f = open(config_path, 'a+')
-    f.write('setup_nginx: yes\n')
+    assignDefaultsByGroup('nginx', f)
     f.close()
 
     config_path = initializeConfig(path.join(base_dir, NodeTypeEnum.seed.name, 'vars.yml'), overwrite)
+    assignDefaultsByGroup('seed', f)
     f.close()
+
+def assignDefaultsByGroup(group, f):
+    with open('./data/defaults', 'r') as file:
+        try:
+            defaults = yaml.load(file, Loader=yaml.FullLoader)
+            for default in defaults[group]:
+                f.write(f'{default}: {defaults[group][default]}\n')
+        except Exception as e:
+            click.echo(f'[Error] Exception thrown while retrieving group variable defaults: {e}' )
 
 def setEnvironmentGroupVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)
@@ -399,7 +385,7 @@ def setEnvironmentStageVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)
 
     f = open(path.join(base_dir, environment,'vars.yml'), 'a+')
-    with open('./network_data/chain_ids', 'r') as file:
+    with open('./data/chain_ids', 'r') as file:
         try:
             chain_ids = yaml.load(file, Loader=yaml.FullLoader)
             f.write(f'chain_id: {chain_ids[token.name][environment]}\n')
@@ -408,7 +394,7 @@ def setEnvironmentStageVars(base_dir, environment, overwrite):
 
     #TODO: Dynamic peer list sourcing/validation?
     f.write('peers:\n')
-    with open(f'./network_data/peers/{token.name}/{environment}/current.peers', 'r') as peers:
+    with open(f'./data/peers/{token.name}/{environment}/current.peers', 'r') as peers:
         try:
             for peer in peers:
                 if 'str' in peer:
@@ -506,49 +492,13 @@ def initializeConfig(config_path, overwrite):
 
 def configureDefaultsAll(config_path, overwrite):
     f = open(config_path, 'a+')
-    defaults = [
-        'working_dir: /opt/eosio\n',
-        'deploy_user: eosio\n',
-        'deploy_group: eosio\n',
-        'agent_name: default\n',
-        'producer_name: default\n',
-        'provider_website: https://default.io\n',
-        'pid_file: nodeos.pid\n',
-        'p2p_server_ip: 0.0.0.0\n',
-        'p2p_server_port: 9876\n',
-        'http_server_ip: 0.0.0.0\n',
-        'http_server_port: 8888\n',
-        'http_proxy_ip: 127.0.0.1\n',
-        'http_proxy_port: 8888\n',
-        'state_history_server_ip: 127.0.0.1\n',
-        'state_history_server_port: 8887\n',
-        'genesis_json_path: /opt/eosio/deploy/genesis.json\n',
-        'git_repo: https://github.com/EOSIO/eos.git\n',
-        'peer_pubkey:\n',
-        'peer_privkey:\n',
-        'peer_keys:\n',
-        'mongo_flag:\n',
-        'setup_block_storage:\n',
-        'wasm_runtime: eos-vm-jit\n',
-        'prebuilt: yes\n',
-        'bin_package: yes\n',
-        'bin_src: remote\n',
-        'bin_package_base_url: https://github.com/eosio/eos/releases/download\n',
-        'version: v2.0.7\n',
-        'package: eosio_2.0.7-1-ubuntu-18.04_amd64.deb\n',
-        'build_script: eosio_build.sh\n',
-        'apply_patch:\n',
-        'force_build:\n',
-        'setup_hyperion:\n',
-        'setup_oracle: ',
-        'setup_oig: ',
-        'nodeos_bin: nodeos',
-        'cli_bin: cleos',
-        'keosd_bin: keosd',
-        'testnet_name:'
-    ]
-
-    f.writelines(defaults)
+    with open('./data/defaults', 'r') as file:
+        try:
+            defaults = yaml.load(file, Loader=yaml.FullLoader)
+            for default in defaults['all']:
+                f.write(f'{default}: {defaults["all"][default]}\n')
+        except Exception as e:
+            sys.exit(e)
     f.close()
 
 @click.command('vault-encrypt', help='Use to encrypt sensitive data via ansible vault.')

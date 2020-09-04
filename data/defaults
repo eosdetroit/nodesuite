@@ -1,0 +1,157 @@
+dev:
+    chain_state_db_size_mb: 8192
+    stage: dev
+    jvm_heap_size: 4g
+    claims_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+    oig_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+    oracle_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+
+test:
+    stage: test
+
+prod:
+    stage: prod
+
+producer:
+    setup_producer: yes
+    setup_claims: yes
+    claims_wallet_name: claims
+    cpu_effort_percent: 40
+    last_block_cpu_effort_percent: 25
+
+state_history:
+    setup_state_history: yes
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8080
+    eos_vm_oc_enable: yes
+
+v1_history:
+    setup_v1_history: yes
+
+hyperion:
+    setup_hyperion: yes
+    setup_state_history: yes
+    api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
+    hyperion_version: 3.1.0-beta.4
+    rabbitmq_username: "rabbitusername"
+    rabbitmq_password: '{{ vault_rabbitmq_password }}'
+    http_proxy_port: 7000
+    hyp_es_port: 9200
+    service_name: hyperionapi
+    es_master_node: true
+    es_data_node: false
+    hyp_es_version: 7.8.1
+    es_data_dir: /opt/eosio/deploy/elasticsearch
+    es_conf_path: /etc/elasticsearch/elasticsearch.yml
+    es_jvm_opts_path: /etc/elasticsearch/jvm.options
+    es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
+    hyp_es_api_basic_auth_username: "elastic"
+    hyp_es_api_basic_auth_password: '{{ vault_es_api_basic_auth_password }}'
+    hyp_es_enable_xpack: true
+    jvm_heap_size: 8g
+
+mongo:
+    setup_mongo: yes
+    mongo_git_repo: https://github.com/CryptoLions/EOS-mongo-history-API
+    mongo_api_version: master
+    http_proxy_port: 3333
+    service_name: mongoapi
+    mongo_flag: -m
+nginx:
+    setup_nginx: yes
+
+eos:
+    name: eos
+    token_symbol: EOS
+
+fio:
+    name: fio
+    token_symbol: FIO
+    git_repo: https://github.com/fioprotocol/fio.git
+    version: v2.0.0
+    prebuilt: yes
+    package: fioprotocol-1.1.0-rc1-ubuntu-18.04-amd64.deb
+    bin_package: yes
+    bin_src: local
+    pkg_install_path: /usr/local/bin
+    cli_bin: clio
+    http_max_response_time_ms:
+    build_script: fio_build.sh
+    max_clients: 100
+    claim_account: fio.treasury
+    claim_action: bpclaim
+    cpu_effort_percent:
+    last_block_cpu_effort_percent:
+    wasm_runtime: wabt
+    apply_patch: no
+
+proton:
+    name: proton
+    token_symbol: SYS
+    wasm_runtime: eos-vm-jit
+
+telos:
+    name: telos
+    token_symbol: TLOS
+    peer_publickey:
+    peer_privkey:
+    peer_keys:
+    chain_state_db_size_mb: 16384
+
+wax:
+    name: wax
+    token_symbol: WAX
+    git_repo: https://github.com/cc32d9/wax2.0.git
+    version: v2.0.6wax02
+    chain_state_db_size_mb: 32768
+    snapshot_provider: sweden
+    claim_action: claimgbmprod
+    prebuilt: yes
+    package: wax
+    apt_package: yes
+    bin_package: no
+    pkg_gpg_key: https://apt.waxsweden.org/key
+    pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
+    wasm_runtime: wabt
+    last_block_time_offset_us: -300000
+
+all:
+    working_dir: /opt/eosio
+    deploy_user: eosio
+    deploy_group: eosio
+    agent_name: default
+    producer_name: default
+    provider_website: https://default.io
+    pid_file: nodeos.pid
+    p2p_server_ip: 0.0.0.0
+    p2p_server_port: 9876
+    http_server_ip: 0.0.0.0
+    http_server_port: 8888
+    http_proxy_ip: 127.0.0.1
+    http_proxy_port: 8888
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8887
+    genesis_json_path: /opt/eosio/deploy/genesis.json
+    git_repo: https://github.com/EOSIO/eos.git
+    peer_pubkey:
+    peer_privkey:
+    peer_keys:
+    mongo_flag:
+    setup_block_storage:
+    wasm_runtime: eos-vm-jit
+    prebuilt: yes
+    bin_package: yes
+    bin_src: remote
+    bin_package_base_url: https://github.com/eosio/eos/releases/download
+    version: v2.0.7
+    package: eosio_2.0.7-1-ubuntu-18.04_amd64.deb
+    build_script: eosio_build.sh
+    apply_patch:
+    force_build:
+    setup_hyperion:
+    setup_oracle: '
+    setup_oig: '
+    nodeos_bin: nodeos'
+    cli_bin: cleos'
+    keosd_bin: keosd'
+    testnet_name:
