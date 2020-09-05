@@ -75,6 +75,10 @@ read-mode = speculative
 read-mode = head
 {% endif %}
 
+{% if node_type == "seed" %}
+p2p-accept-transactions = false 
+{% endif %}
+
 # Chain validation mode ("full" or "light").
 # In "full" mode all incoming blocks will be fully validated.
 # In "light" mode all incoming blocks headers will be fully validated; transactions in those validated blocks will be trusted

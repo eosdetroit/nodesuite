@@ -64,3 +64,4 @@ block_log_file:
 block_log_url:
 data_dir: deploy/data
 update_configs_only: no
+node_type: 

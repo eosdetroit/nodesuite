@@ -50,6 +50,9 @@ hyperion:
     hyp_es_enable_xpack: true
     jvm_heap_size: 8g
 
+seed:
+    node_type: seed
+
 mongo:
     setup_mongo: yes
     mongo_git_repo: https://github.com/CryptoLions/EOS-mongo-history-API
