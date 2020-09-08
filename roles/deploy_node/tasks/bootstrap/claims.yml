@@ -31,4 +31,4 @@
     user: "{{ deploy_user }}"
     hour: '{{ claims_hour }}'
     minute: '{{ claims_minute }}'
-  when: 'content' in claimspw
+  when: "'content' in claimspw"
