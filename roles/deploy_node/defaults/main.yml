@@ -28,8 +28,8 @@ producer_threads: 2
 txn_test_gen_threads: 2
 sync_fetch_span: 500
 max_transaction_time: 150000
-claims_hour: *
-claims_minute: *
+claims_hour: '*'
+claims_minute: '*'
 claims_api_url: http://127.0.0.1
 claims_api_port: 8282
 claim_permission: claims
