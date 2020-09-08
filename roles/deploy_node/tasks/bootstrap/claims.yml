@@ -29,13 +29,6 @@
     name: claim rewards
     job: "{{ working_dir }}/cron/claim_rewards.sh {{ claimspw['content'] | b64decode }} >> {{ working_dir }}/cron/{{ claims_wallet_name }}.log"
     user: "{{ deploy_user }}"
-  when: name != "telos"
-
-- name: Install claims script cron on Telos
-  cron:
-    name: claim rewards
-    job: "{{ working_dir }}/cron/claim_rewards.sh {{ claimspw['content'] | b64decode }} >> {{ working_dir }}/cron/{{ claims_wallet_name }}.log"
-    user: "{{ deploy_user }}"
-    hour: 16
-    minute: 30
-  when: name == "telos"
+    hour: '{{ claims_hour }}'
+    minute: '{{ claims_minute }}'
+  when: 'content' in claimspw
