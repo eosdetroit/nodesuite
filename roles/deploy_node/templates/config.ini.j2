@@ -264,8 +264,11 @@ max-transaction-time = {{ max_transaction_time }}
 {% if setup_producer | bool %}
 plugin = eosio::producer_plugin
 producer-name = {{ producer_name }}
-signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
-
+	{% if is_failover | bool %}
+	signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_signing_key }}
+	{% else %}
+	signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
+	{% endif %}
 {% if last_block_time_offset_us | d() | bool %}
 last-block-time-offset-us = {{ last_block_time_offset_us }}
 {% endif %}
