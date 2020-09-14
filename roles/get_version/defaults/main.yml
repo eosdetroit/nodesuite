@@ -1,0 +1,4 @@
+---
+nodeos_bin: nodeos
+cli_bin: cleos
+keosd_bin: keosd

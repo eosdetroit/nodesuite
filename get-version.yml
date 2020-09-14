@@ -1,0 +1,7 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: '{{ deploy_user }}'
+  roles:
+    - { role: get_version }
