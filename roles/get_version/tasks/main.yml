@@ -1,5 +1,5 @@
 ---
-- name: Retrieve version data for {{ inventory_hostname }}
+- name: Retrieve version
   shell: '{{ cli_bin }} version client'
   args:
     executable: /bin/bash
@@ -8,6 +8,6 @@
   become_user: '{{ deploy_user }}'
   register: client_version
   
-- name: "{{ inventory_hostname }}"
+- name: Output
   debug: 
     msg: "{{ client_version.stdout }}"
