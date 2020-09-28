@@ -9,6 +9,7 @@ api_endpoint:
 do_replay:
 use_snapshot:
 use_genesis_json:
+enable_account_queries:
 setup_hyperion:
 setup_state_history:
 setup_mongo:
