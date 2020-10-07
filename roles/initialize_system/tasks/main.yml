@@ -40,21 +40,9 @@
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
 
-- name: Find block storage mount
-  find:
-    paths: '/mnt'
-    recurse: no
-    file_type: directory
-  register: mount_dir
+- name: Prepare block storage
+  include: prepare_block_storage.yml
   when: setup_block_storage | bool
-
-- name: Linking working directory to block storage
-  file:
-    src: '{{ mount_dir.files[0].path }}'
-    path: '{{ working_dir }}'
-    state: link
-    force: yes
-  when: setup_block_storage | bool and mount_dir.files[0] is defined
 
 - name: Create sub directories
   file:

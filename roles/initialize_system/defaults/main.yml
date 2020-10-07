@@ -4,3 +4,4 @@ cpu_governor: performance
 cpu_min_speed: 4800MHz
 cpu_max_speed: 4800MHz
 tune_cpu:
+provider: do
