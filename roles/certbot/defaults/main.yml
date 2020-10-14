@@ -1,0 +1,5 @@
+---
+api_endpoint:
+certbot_email:
+#For certbot prompt - [1: No redirect, 2: Force redirect]
+force_redirect: 1

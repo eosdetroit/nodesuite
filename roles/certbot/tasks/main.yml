@@ -1,0 +1,25 @@
+---
+- name: Install pip
+  apt: 
+    name: 'python3-pip'
+    state: latest
+    update_cache: yes
+
+- name: Install pexpect
+  pip:
+    name: pexpect
+  become: yes
+
+- name: Request new cert for {{ api_endpoint }}
+  expect:
+    command: "certbot -d {{ api_endpoint }} --nginx"
+    responses:
+      "Enter email address": "{{ certbot_email }}"
+      "agree in order to register with the ACME server": "A"
+      "Would you be willing to share your email address with the Electronic Frontier": "N"
+      "Select the appropriate number": "{{ force_redirect }}"
+  become: yes
+  register: output
+
+- name: Certbot output
+  debug: msg="{{ output.stdout }}"
