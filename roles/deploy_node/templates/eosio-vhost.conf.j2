@@ -18,6 +18,7 @@ server {
     tcp_nodelay on;
 
     location / {
+        add_header 'Access-Control-Allow-Methods' 'GET, POST';
         proxy_pass http://{{ service_name }};
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $host;
@@ -29,6 +30,8 @@ server {
         proxy_set_header Connection "upgrade";
         limit_req zone=mylimit burst=20 nodelay;
     }
+    add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept' always;
+
     listen 443 ssl http2;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
@@ -46,6 +49,7 @@ server {
     tcp_nodelay on;
 
     location / {
+        add_header 'Access-Control-Allow-Methods' 'GET, POST';
         proxy_pass http://{{ service_name }};
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header Host $host;
@@ -57,7 +61,8 @@ server {
         proxy_set_header Connection "upgrade";
         limit_req zone=mylimit burst=20 nodelay;
     }
-    
+    add_header 'Access-Control-Allow-Headers' 'Origin, X-Requested-With, Content-Type, Accept' always;
+
     listen 80;
     server_name {{ api_endpoint }};
 }
