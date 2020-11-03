@@ -23,3 +23,31 @@
 
 - name: Certbot output
   debug: msg="{{ output.stdout }}"
+
+- name: Installing certbot renewal service
+  template:
+    src: 'certbot-renewal.service.j2'
+    dest: '/etc/systemd/system/certbot-renewal.service'
+    mode: u+rwx
+    force: yes
+    
+- name: Installing certbot timer
+  template:
+    src: 'certbot-renewal.timer.j2'
+    dest: '/etc/systemd/system/certbot-renewal.timer'
+    mode: u+rwx
+    force: yes
+    
+- name: Start certbot renewal timer
+  shell: 'sudo systemctl start certbot-renewal.timer'
+  args:
+    executable: /bin/bash
+  become: yes
+  become_user: '{{ deploy_user }}'
+
+- name: Enable certbot renewal timer on boot
+  shell: 'sudo systemctl enable certbot-renewal.timer'
+  args:
+    executable: /bin/bash
+  become: yes
+  become_user: '{{ deploy_user }}'

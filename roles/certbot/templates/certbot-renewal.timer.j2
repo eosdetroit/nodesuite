@@ -1,0 +1,9 @@
+[Unit]
+Description=Timer for Certbot Renewal
+
+[Timer]
+OnBootSec=300
+OnUnitActiveSec={{certbot_renewal_weeks}}w
+
+[Install]
+WantedBy=multi-user.target
