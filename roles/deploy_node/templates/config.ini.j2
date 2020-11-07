@@ -75,7 +75,7 @@ read-mode = speculative
 read-mode = head
 {% endif %}
 
-{% if node_type == "seed" %}
+{% if ((node_type == "seed") and (name != "fio")) %}
 p2p-accept-transactions = false 
 {% endif %}
 
