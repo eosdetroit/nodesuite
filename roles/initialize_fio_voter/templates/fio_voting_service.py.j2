@@ -1,0 +1,125 @@
+from multiprocessing import Process
+from time import sleep
+import requests
+from subprocess import Popen, PIPE
+from datetime import datetime
+import os.path
+from os import path
+
+fee_ratios = '[{"end_point":"register_fio_domain","value":{{register_fio_domain}}},{"end_point":"register_fio_address","value":{{register_fio_address}}},{"end_point":"renew_fio_domain","value":{{renew_fio_domain}}},{"end_point":"renew_fio_address","value":{{renew_fio_address}}},{"end_point":"add_pub_address","value":{{add_pub_address}}},{"end_point":"transfer_tokens_pub_key","value":{{transfer_tokens_pub_key}}},{"end_point":"new_funds_request","value":{{new_funds_request}}},{"end_point":"reject_funds_request","value":{{reject_funds_request}}},{"end_point":"record_obt_data","value":{{record_obt_data}}},{"end_point":"set_fio_domain_public","value":{{set_fio_domain_public}}},{"end_point":"register_producer","value":{{register_producer}}},{"end_point":"register_proxy","value":{{register_proxy}}},{"end_point":"unregister_proxy","value":{{unregister_proxy}}},{"end_point":"unregister_producer","value":{{unregister_producer}}},{"end_point":"proxy_vote","value":{{proxy_vote}}},{"end_point":"vote_producer","value":{{vote_producer}}},{"end_point":"auth_delete","value":{{auth_delete}}},{"end_point":"auth_link","value":{{auth_link}}},{"end_point":"auth_update","value":{{auth_update}}},{"end_point":"msig_propose","value":{{msig_propose}}},{"end_point":"msig_approve","value":{{msig_approve}}},{"end_point":"msig_unapprove","value":{{msig_unapprove}}},{"end_point":"msig_cancel","value":{{msig_cancel}}},{"end_point":"msig_exec","value":{{msig_exec}}},{"end_point":"msig_invalidate","value":{{msig_invalidate}}},{"end_point":"cancel_funds_request","value":{{cancel_funds_request}}},{"end_point":"remove_pub_address","value":{{remove_pub_address}}},{"end_point":"remove_all_pub_addresses","value":{{remove_all_pub_addresses}}},{"end_point":"transfer_fio_domain","value":{{transfer_fio_domain}}},{"end_point":"transfer_fio_address","value":{{transfer_fio_address}}},{"end_point":"submit_fee_multiplier","value":{{submit_fee_multiplier}}},{"end_point":"submit_fee_ratios","value":{{submit_fee_ratios}}},{"end_point":"burn_fio_address","value":{{burn_fio_address}}},{"end_point":"add_to_whitelist","value":{{add_to_whitelist}}},{"end_point":"remove_from_whitelist","value":{{remove_from_whitelist}}},{"end_point":"submit_bundled_transaction","value":{{submit_bundled_transaction}}}]'
+
+actor = '{{ actor }}'
+permission = '{{ permission }}'
+max_fee = {{ max_fee }}
+api_url = '{{ api_url }}'
+backup_api_url = '{{ backup_api_url }}'
+base_rate = 1
+wallet_password = ''
+
+def log(message):
+    with open('./voter.log', 'a+') as file:
+        file.write(f'{datetime.now()}: {message}\n')
+
+def set_fee_multiplier():
+    sleep(30)
+    log('Polling exchange rate.')
+    initial_rate = get_current_rate()
+    while not initial_rate:
+        initial_rate = get_current_rate()
+    
+    multiplier = str(base_rate / initial_rate)
+
+
+    log(f'Setting multiplier: {multiplier}')
+    unlock_wallet()    
+    command = f'{{ voter_working_dir }}/clio -u {api_url} push action fio.fee setfeemult \'{% raw %}{{\"multiplier\":{multiplier},\"max_fee\":{max_fee},\"actor\":\"{actor}\"}}{% endraw %}\' -p {actor}@{permission}'
+    run_command(command, 'set_fee_mult')
+    sleep(180)
+    while 1:
+        current_rate = get_current_rate()
+        if current_rate:
+            diff = abs((current_rate - initial_rate)/initial_rate*100)
+            if diff >= 0.1:
+                multiplier = str(base_rate / current_rate)
+                log(f'Setting multiplier: {multiplier}')
+                unlock_wallet()
+                command = f'{{ voter_working_dir }}/clio -u {api_url} push action fio.fee setfeemult \'{% raw %}{{\"multiplier\":{multiplier},\"max_fee\":{max_fee},\"actor\":\"{actor}\"}}{% endraw %}\' -p {actor}@{permission}'
+                run_command(command, 'set_fee_mult')
+                initial_rate = current_rate
+            else:
+                log('No action taken. Difference between on-chain multiplier and current: ' + str(diff) + '%')
+        else:
+            log('Failed to obtain exchange rate.')
+
+        sleep(180)
+
+def get_current_rate():
+    r = requests.get('https://api.coingecko.com/api/v3/simple/price?ids=fio-protocol&vs_currencies=usd')
+
+    if r.status_code == 200:
+        return r.json()['fio-protocol']['usd']
+    else:
+        return 0
+
+def set_fee_vote():
+    sleep(20)
+    log('Starting fee voter.')
+    while 1:
+        log('Casting vote.')
+        unlock_wallet()
+        command = f'{{ voter_working_dir }}/clio -u {api_url} push action fio.fee setfeevote \'{% raw %}{{\"fee_ratios\":{fee_ratios},\"max_fee\":{max_fee},\"actor\":\"{actor}\"}}{% endraw %}\' -p {actor}@{permission}'
+        run_command(command, 'set_fee_vote')
+        sleep(3600)
+
+def setup_wallet():
+    global wallet_password  
+
+    if path.exists('{{ voter_working_dir }}/voter'):
+        with open (f'{{ voter_working_dir }}/voter', "r") as password:
+            wallet_password=password.readlines()[0]
+        log('Skipping wallet setup: voter wallet found.') 
+        return
+
+    log('No voter wallet found. Creating wallet.')
+    command = f'{{ voter_working_dir }}/clio wallet create -n voter -f voter'
+    run_command(command, 'create_wallet')
+
+    with open (f'{{ voter_working_dir }}/voter', "r") as password:
+        log('Storing wallet credentials.')
+        wallet_password=password.readlines()[0]
+
+    unlock_wallet()
+    log('Adding private key to voter wallet.')
+    command = '{{ voter_working_dir }}/clio wallet import -n voter --private-key {{ voter_private_key }}'
+    run_command(command, 'add_wallet_key')
+    log('Wallet setup complete.')
+
+def unlock_wallet():
+    global wallet_password
+
+    log('Calling unlock wallet...')
+    command = f'{{ voter_working_dir }}/clio wallet unlock -n voter --password {wallet_password}'
+    run_command(command, 'unlock_wallet')
+
+def run_command(command, msg):
+    try:    
+        process = Popen(command, shell=True, stdout=PIPE, stderr=PIPE)
+        sleep(5)
+        out, err = process.communicate()
+        if((err) and ("executed transaction" not in str(err) and "saving password" not in str(err)  and "Already unlocked" not in str(err))):
+            log(f'[Error][{msg}] command failed - {err}')
+        else:
+            log(f'[{msg}] command executed.')
+    except Exception as e:
+        log(f'[Error] Exception thrown: {e}')
+
+
+def health_check():
+    command = f'{{ voter_working_dir }}/clio get info'
+    run_command(command, 'health_check_get_info')
+
+if __name__ == '__main__':
+    setup_wallet()
+    Process(target=set_fee_multiplier).start()
+    Process(target=set_fee_vote).start()
+    
