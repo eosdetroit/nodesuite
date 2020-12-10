@@ -146,8 +146,8 @@ all:
     bin_package: yes
     bin_src: remote
     bin_package_base_url: https://github.com/eosio/eos/releases/download
-    version: v2.0.7
-    package: eosio_2.0.7-1-ubuntu-18.04_amd64.deb
+    version: v2.0.8
+    package: eosio_2.0.8-1-ubuntu-18.04_amd64.deb
     build_script: eosio_build.sh
     apply_patch:
     force_build:
