@@ -8,9 +8,3 @@ nodeos_bin: nodeos
 cli_bin: cleos
 keosd_bin: keosd
 patches:
-  - name: eosio-2.0.4-patch1-for-eos-vm-submodule.patch
-    patch_dir: /opt/eosio/src/eosio/libraries/eos-vm
-  - name: eosio-2.0.4-patch1-for-build-script.patch
-    patch_dir: /opt/eosio/src/eosio
-  - name: eosio-2.0.4-patch1-for-root.patch
-    patch_dir: /opt/eosio/src/eosio
