@@ -152,9 +152,9 @@ all:
     apply_patch:
     force_build:
     setup_hyperion:
-    setup_oracle: '
-    setup_oig: '
-    nodeos_bin: nodeos'
-    cli_bin: cleos'
-    keosd_bin: keosd'
+    setup_oracle: 
+    setup_oig: 
+    nodeos_bin: nodeos
+    cli_bin: cleos
+    keosd_bin: keosd
     testnet_name:
