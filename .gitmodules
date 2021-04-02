@@ -1,0 +1,3 @@
+[submodule ".private"]
+	path = .private
+	url = git@github.com:bensig/ansible-nodesuite-quantumblok-private.git
