@@ -53,6 +53,27 @@
     mode: u+rwx
     force: yes
 
+- name: Installing nodeos quickrestart script
+  template:
+    src: 'quickrestart.sh.j2'
+    dest: '{{ working_dir }}/deploy/quickrestart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos restart script
+  template:
+    src: 'restart.sh.j2'
+    dest: '{{ working_dir }}/deploy/restart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos stop script
+  template:
+    src: 'stop.sh.j2'
+    dest: '{{ working_dir }}/deploy/stop.sh'
+    mode: u+rwx
+    force: yes
+
 - name: Installing nodeos service config
   template:
     src: 'nodeos.service.j2'

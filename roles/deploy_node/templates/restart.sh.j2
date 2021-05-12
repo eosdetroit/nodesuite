@@ -1,0 +1,5 @@
+/opt/eosio/deploy/stop.sh
+
+wget {{ snapshot_base_url }}/{{ snapshot_file }} -O /opt/eosio/snapshots/latest-snapshot.bin
+
+/opt/eosio/deploy/start.sh
