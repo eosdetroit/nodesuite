@@ -14,10 +14,6 @@ read-mode = head
 {% if ((node_type == "seed") and (name != "fio")) %}
 p2p-accept-transactions = false 
 {% endif %}
-# trusted-producer =
-{% if producer_name %}
-trusted-producer = {{ producer_name }}
-{% endif %}
 {% if http_max_response_time_ms | d() %}
 http-max-response-time-ms = {{ http_max_response_time_ms }}
 {% endif %}
@@ -31,19 +27,19 @@ net-threads = {{ net_threads }}
 sync-fetch-span = {{ sync_fetch_span }}
 max-transaction-time = {{ max_transaction_time }}
 p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
-{% if unix_socket_path | d() | bool %}
-unix-socket-path = /tmp/echo.sock
+{% if producer_name %}
+trusted-producer = {{ producer_name }}
 {% endif %}
-{% if cpu_effort_percent | d() | bool %}
+{% if cpu_effort_percent %}
 cpu-effort-percent = {{ cpu_effort_percent }}
 {% endif %}
-{% if last_block_time_offset_us | d() | bool %}
+{% if last_block_time_offset_us %}
 last-block-time-offset-us = {{ last_block_time_offset_us }}
 {% endif %}
-{% if last_block_cpu_effort_percent | d() | bool %}
+{% if last_block_cpu_effort_percent %}
 last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
 {% endif %}
-{% if producer_threads | d() | bool %}
+{% if producer_threads %}
 producer-threads = {{ producer_threads }}
 txn-test-gen-threads = {{ txn_test_gen_threads }}
 {% endif %}
@@ -52,6 +48,7 @@ plugin = {{ plugin }}
 {% endfor %}
 {% if setup_producer | bool %}
 plugin = eosio::producer_plugin
+plugin = eosio::producer_api_plugin
 producer-name = {{ producer_name }}
 signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
 pause-on-startup = {{ pause_on_startup }}

@@ -8,6 +8,6 @@ Restart=always
 Type=forking
 WorkingDirectory={{ working_dir}}/deploy
 ExecStart={{ working_dir }}/deploy/start.sh
-
+ExecStop= /bin/killall nodeos
 [Install]
 WantedBy=multi-user.target

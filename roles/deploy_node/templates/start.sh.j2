@@ -17,5 +17,8 @@
 {% set account_queries_flag = '--enable-account-queries=true' if (enable_account_queries | d() | bool) else empty_flag %}
 
 DATADIR=/opt/eosio/deploy/data
+SNAPSHOT=/opt/eosio/snapshots/latest-snapshot.bin
 
-{{ working_dir }}/deploy/nodeos --data-dir $DATADIR --config-dir {{ working_dir }}/deploy {{ replay_flag }} {{ snapshot_flag }} {{ snapshot }} {{ genesis_json_flag }} {{ genesis_json }} {{ account_queries_flag }} {{ disable_replay_opts_flag }} --delete-all-blocks  --snapshot /opt/eosio/snapshots/latest-snapshot.bin 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
+wget {{ snapshot_base_url }}/{{ snapshot_file }} -O $SNAPSHOT
+
+{{ working_dir }}/deploy/nodeos --data-dir $DATADIR --config-dir {{ working_dir }}/deploy {{ replay_flag }} {{ snapshot_flag }} {{ snapshot }} {{ genesis_json_flag }} {{ genesis_json }} {{ account_queries_flag }} {{ disable_replay_opts_flag }} --delete-all-blocks  --snapshot $SNAPSHOT 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
