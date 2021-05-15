@@ -60,6 +60,13 @@
     mode: u+rwx
     force: yes
 
+- name: Installing nodeos chk_producer script
+  template:
+    src: 'chk_producer.sh.j2'
+    dest: '{{ working_dir }}/deploy/chk_producer.sh'
+    mode: u+rwx
+    force: yes
+
 - name: Installing nodeos restart script
   template:
     src: 'restart.sh.j2'
