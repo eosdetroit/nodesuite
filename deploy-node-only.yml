@@ -1,0 +1,13 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: '{{ deploy_user }}'
+  vars:
+    use_snapshot: yes
+    update_configs_only: yes
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+    - 'stage_vars/{{ name }}/{{ stage }}/vault.yml'
+  roles:
+    - { role: deploy_node }
