@@ -81,6 +81,13 @@
     mode: u+rwx
     force: yes
 
+- name: Installing crontab example text for backup producer
+  template:
+    src: 'crontab.j2'
+    dest: '{{ working_dir }}/deploy/crontab'
+    mode: u+rwx
+    force: yes    
+
 - name: Installing nodeos service config
   template:
     src: 'nodeos.service.j2'

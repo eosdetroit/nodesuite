@@ -2,11 +2,10 @@
 
 currdate=`date`
 lastprod=(`tail -n 1000 /opt/eosio/deploy/data/stderr.txt | grep 'Received\|Produced' | grep quantumblok | tail -n 1| awk '{print $2}'`)
-
+echo $currdate
 diff=$(( $(date -d "$currdate" "+%s") - $(date -d "$lastprod" "+%s") ))
 if (( "$diff" < "120" )); then
-        echo ok
+        curl -s http://127.0.0.1:8888/v1/producer/paused
 else
-        echo not ok
+        curl -s http://127.0.0.1:8888/v1/producer/resume
 fi
-

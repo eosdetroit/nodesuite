@@ -6,8 +6,10 @@ After=network.target
 User={{ deploy_user }}
 Restart=always
 Type=forking
+PIDfile={{ working_dir}}/deploy/data/nodeos.pid
 WorkingDirectory={{ working_dir}}/deploy
 ExecStart={{ working_dir }}/deploy/start.sh
-ExecStop= /bin/killall nodeos
+ExecStop=/bin/killall nodeos
+ExecReload=/bin/killall nodeos 
 [Install]
 WantedBy=multi-user.target
