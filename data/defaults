@@ -83,8 +83,8 @@ fio:
     max_clients: 100
     claim_account: fio.treasury
     claim_action: bpclaim
-    cpu_effort_percent:
-    last_block_cpu_effort_percent:
+    cpu_effort_percent: ''
+    last_block_cpu_effort_percent: ''
     wasm_runtime: wabt
     apply_patch: no
 
@@ -96,9 +96,9 @@ proton:
 telos:
     name: telos
     token_symbol: TLOS
-    peer_publickey:
-    peer_privkey:
-    peer_keys:
+    peer_publickey: ''
+    peer_privkey: ''
+    peer_keys: ''
     chain_state_db_size_mb: 16384
 
 wax:
@@ -136,11 +136,11 @@ all:
     state_history_server_port: 8887
     genesis_json_path: /opt/eosio/deploy/genesis.json
     git_repo: https://github.com/EOSIO/eos.git
-    peer_pubkey:
-    peer_privkey:
-    peer_keys:
-    mongo_flag:
-    setup_block_storage:
+    peer_pubkey: ''
+    peer_privkey: ''
+    peer_keys: ''
+    mongo_flag: ''
+    setup_block_storage: ''
     wasm_runtime: eos-vm-jit
     prebuilt: yes
     bin_package: yes
@@ -149,12 +149,12 @@ all:
     version: v2.0.8
     package: eosio_2.0.8-1-ubuntu-18.04_amd64.deb
     build_script: eosio_build.sh
-    apply_patch:
-    force_build:
-    setup_hyperion:
-    setup_oracle: 
-    setup_oig: 
+    apply_patch: ''
+    force_build: ''
+    setup_hyperion: ''
+    setup_oracle: ''
+    setup_oig: ''
     nodeos_bin: nodeos
     cli_bin: cleos
     keosd_bin: keosd
-    testnet_name:
+    testnet_name: ''
