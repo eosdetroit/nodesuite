@@ -71,13 +71,14 @@ fio:
     name: fio
     token_symbol: FIO
     git_repo: https://github.com/fioprotocol/fio.git
-    version: v2.0.0
+    version: v3.0.1
     prebuilt: yes
-    package: fioprotocol-1.1.0-rc1-ubuntu-18.04-amd64.deb
+    package: fioprotocol-3.0.1-ubuntu-18.04-amd64.deb
     bin_package: yes
     bin_src: local
     pkg_install_path: /usr/local/bin
     cli_bin: clio
+    keosd_bin: fio-wallet
     http_max_response_time_ms:
     build_script: fio_build.sh
     max_clients: 100
@@ -105,7 +106,7 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v2.0.6wax02
+    version: v2.0.13wax01
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
@@ -115,8 +116,10 @@ wax:
     bin_package: no
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
-    wasm_runtime: wabt
+    wasm_runtime: eos-vm-jit
     last_block_time_offset_us: -300000
+    cpu_effort_percent: 40
+    last_block_cpu_effort_percent: 25
 
 all:
     working_dir: /opt/eosio
@@ -146,8 +149,8 @@ all:
     bin_package: yes
     bin_src: remote
     bin_package_base_url: https://github.com/eosio/eos/releases/download
-    version: v2.0.8
-    package: eosio_2.0.8-1-ubuntu-18.04_amd64.deb
+    version: v2.0.13
+    package: eosio_2.0.13-1-ubuntu-18.04_amd64.deb
     build_script: eosio_build.sh
     apply_patch: ''
     force_build: ''
