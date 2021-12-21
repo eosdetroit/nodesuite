@@ -71,9 +71,9 @@ fio:
     name: fio
     token_symbol: FIO
     git_repo: https://github.com/fioprotocol/fio.git
-    version: v3.0.1
+    version: v3.1.0
     prebuilt: yes
-    package: fioprotocol-3.0.1-ubuntu-18.04-amd64.deb
+    package: fioprotocol-3.1.0-ubuntu-18.04-amd64.deb
     bin_package: yes
     bin_src: local
     pkg_install_path: /usr/local/bin
