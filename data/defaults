@@ -77,8 +77,9 @@ fio:
     bin_package: yes
     bin_src: local
     pkg_install_path: /usr/local/bin
-    cli_bin: clio
+    cli_bin: fio-cleos
     keosd_bin: fio-wallet
+    nodeos_bin: fio-nodeos
     http_max_response_time_ms:
     build_script: fio_build.sh
     max_clients: 100
