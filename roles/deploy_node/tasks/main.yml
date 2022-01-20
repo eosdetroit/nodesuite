@@ -53,6 +53,13 @@
     mode: u+rwx
     force: yes
 
+- name: Installing nodeos v2start script
+  template:
+    src: 'v2start.sh.j2'
+    dest: '{{ working_dir }}/deploy/v2start.sh'
+    mode: u+rwx
+    force: yes
+
 - name: Installing nodeos quickrestart script
   template:
     src: 'quickrestart.sh.j2'
