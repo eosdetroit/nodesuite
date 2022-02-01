@@ -24,6 +24,7 @@ class TokenEnum(Enum):
     telos  = 'TLOS'
     wax    = 'WAXP'
     proton = 'XPR'
+    libre = "LIBRE"
 
 class EnvironmentEnum(Enum):
     dev  = 'dev'
