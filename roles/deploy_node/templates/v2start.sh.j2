@@ -17,15 +17,13 @@
 {% set account_queries_flag = '--enable-account-queries=true' if (enable_account_queries | d() | bool) else empty_flag %}
 
 DATADIR=/opt/eosio/deploy/data
-#SNAPSHOT=/opt/eosio/snapshots/latest-snapshot.bin
-#wget http://backup.cryptolions.io/ProtonMainNet/snapshots/latest-snapshot.bin -O $SNAPSHOT
 
 wget {{ snapshot_base_url }} -O {{ snapshot_dir }}/{{ snapshot_tar }}
 tar -zxf {{ snapshot_dir }}/{{ snapshot_tar }} -C {{ snapshot_dir }}
 
-SNAPSHOT=`ls -t {{ snapshot_dir }}/latest*.bin | head -n1`
+#wget https://backup.cryptolions.io/ProtonTestNet/snapshots/latest-snapshot.bin.zst -O /opt/eosio/snapshots/latest-snapshot.bin.zst
+#zstd -df /opt/eosio/snapshots/latest-snapshot.bin.zst -o /opt/eosio/snapshots/latest-snapshot.bin
 
-wget https://backup.cryptolions.io/ProtonTestNet/snapshots/latest-snapshot.bin.zst -O /opt/eosio/snapshots/latest-snapshot.bin.zst
-zstd -df /opt/eosio/snapshots/latest-snapshot.bin.zst -o /opt/eosio/snapshots/latest-snapshot.bin
+SNAPSHOT=`ls -t {{ snapshot_dir }}/*.bin | head -n1`
 
-/opt/eosio/deploy/nodeos --data-dir $DATADIR --config-dir /opt/eosio/deploy --delete-all-blocks  --snapshot $SNAPSHOT 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
+/opt/eosio/deploy/nodeos --data-dir $DATADIR --config-dir /opt/eosio/deploy --delete-all-blocks --snapshot $SNAPSHOT 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
