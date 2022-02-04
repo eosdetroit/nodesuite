@@ -1,4 +1,6 @@
+{% if wasm_runtime %}
 wasm-runtime = {{ wasm_runtime }}
+{% endif %}
 {% if wasm_runtime == "eos-vm-jit" and eos_vm_oc_enable %}
 eos-vm-oc-compile-threads = 4
 eos-vm-oc-enable = 1
@@ -51,8 +53,17 @@ plugin = eosio::producer_plugin
 plugin = eosio::producer_api_plugin
 producer-name = {{ producer_name }}
 signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
+{% endif %}
+{% if pause_on_startup %}
 pause-on-startup = {{ pause_on_startup }}
 {% endif %}
 {% for peer in peers %}
 p2p-peer-address = {{ peer }}
 {% endfor %}
+{% if setup_hyperion | bool %}
+http-validate-host = false
+state-history-endpoint = 127.0.0.1:8887
+plugin = eosio::history_plugin
+plugin = eosio::history_api_plugin
+plugin = eosio::state_history_plugin
+{% endif %}

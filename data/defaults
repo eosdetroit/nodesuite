@@ -88,11 +88,6 @@ fio:
     wasm_runtime: wabt
     apply_patch: no
 
-libre:
-    name: libre
-    token_symbol: SYS
-    wasm_runtime: eos-vm-jit
-
 proton:
     name: proton
     token_symbol: SYS

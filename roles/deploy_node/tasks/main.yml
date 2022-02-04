@@ -35,6 +35,15 @@
     dest: '{{ working_dir }}/deploy/config.ini'
     backup: yes
     mode: u=rw
+    when: not setup_hyperion | bool
+
+- name: Creating Hyperion config.ini file
+  template:
+    src: 'hyperion.config.ini.j2'
+    dest: '{{ working_dir }}/deploy/config.ini'
+    backup: yes
+    mode: u=rw
+    when: setup_hyperion | bool
 
 - include: snapshot/{{ snapshot_provider }}.yml
   when: 
@@ -50,6 +59,13 @@
   template:
     src: 'start.sh.j2'
     dest: '{{ working_dir }}/deploy/start.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos genesis script
+  template:
+    src: 'genesis_start.sh.j2'
+    dest: '{{ working_dir }}/deploy/genesis_start.sh'
     mode: u+rwx
     force: yes
 

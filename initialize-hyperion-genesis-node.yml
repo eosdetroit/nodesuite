@@ -31,3 +31,4 @@
     - stage_vars/{{ name }}/{{ stage }}/vault.yml
   roles:
     - { role: hyperion, when: setup_hyperion | bool }
+    - { role: certbot, when: set_certbot | bool }

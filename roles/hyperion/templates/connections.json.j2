@@ -9,8 +9,8 @@
   "elasticsearch": {
     "host": "127.0.0.1:{{ hyp_es_port }}",
     "ingest_nodes": ["127.0.0.1:{{ hyp_es_port }}"],
-    "user": "{{ es_api_basic_auth_username }}",
-    "pass": "{{ es_api_basic_auth_password }}"
+    "user": "{{ hyp_es_api_basic_auth_username }}",
+    "pass": "{{ hyp_es_api_basic_auth_password }}"
   },
   "redis": {
     "host": "127.0.0.1",

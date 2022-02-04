@@ -16,13 +16,11 @@
 {% set disable_replay_opts_flag = '--disable-replay-opts' if (setup_state_history | d() | bool) else empty_flag %} 
 {% set account_queries_flag = '--enable-account-queries=true' if (enable_account_queries | d() | bool) else empty_flag %}
 
-DATADIR=/opt/eosio/deploy/data
-#SNAPSHOT=/opt/eosio/snapshots/latest-snapshot.bin
-#wget http://backup.cryptolions.io/ProtonMainNet/snapshots/latest-snapshot.bin -O $SNAPSHOT
+MAINDIR={{ working_dir }}/deploy/
+DATADIR=$MAINDIR/data
 
-wget {{ snapshot_base_url }} -O {{ snapshot_dir }}/{{ snapshot_tar }}
-tar -zxf {{ snapshot_dir }}/{{ snapshot_tar }} -C {{ snapshot_dir }}
+if [ ! -d $DATADIR ]; then
+  mkdir -p $DATADIR;
+fi
 
-SNAPSHOT=`ls -t {{ snapshot_dir }}/snapshot*.bin | head -n1`
-
-{{ working_dir }}/deploy/nodeos --data-dir $DATADIR --config-dir {{ working_dir }}/deploy {{ replay_flag }} {{ snapshot_flag }} {{ snapshot }} {{ genesis_json_flag }} {{ genesis_json }} {{ account_queries_flag }} {{ disable_replay_opts_flag }} --delete-all-blocks  --snapshot $SNAPSHOT 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
+$MAINDIR/nodeos --data-dir $DATADIR --config-dir $MAINDIR {{ replay_flag }} {{ snapshot_flag }} {{ snapshot }} {{ genesis_json_flag }} {{ genesis_json }} {{ account_queries_flag }} {{ disable_replay_opts_flag }} --delete-all-blocks 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid

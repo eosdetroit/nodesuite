@@ -24,8 +24,6 @@ class TokenEnum(Enum):
     telos  = 'TLOS'
     wax    = 'WAXP'
     proton = 'XPR'
-    libre = "LIBRE"
-
 class EnvironmentEnum(Enum):
     dev  = 'dev'
     test = 'test'
@@ -378,9 +376,9 @@ def setInventoryGroupVars(base_dir, overwrite):
     f.write(f'token_symbol: {token.value}\n')
 
     #TODO: remove me? ask if you intend to snep shawt?
-    f.write(f'snapshot_base_url: https://snapshots.eossweden.org/snapshots/aca376/1.8\n')
-    f.write(f'snapshot_file: snapshot-73243379.bin\n')
-    f.write(f'snapshot_provider: nodetools\n')
+    f.write(f'snapshot_base_url: \n')
+    f.write(f'snapshot_file: \n')
+    f.write(f'snapshot_provider: \n')
 
 def setEnvironmentStageVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)
@@ -409,9 +407,9 @@ def setEnvironmentStageVars(base_dir, environment, overwrite):
         except Exception as e:
             logging.error(f'{e}')
 
-    f.write('snapshot_base_url: http://backup.cryptolions.io/Jungle/snapshots\n')
-    f.write('snapshot_file: latest-snapshot.bin\n')
-    f.write('snapshot_provider: cryptolions\n')
+    f.write('snapshot_base_url: \n')
+    f.write('snapshot_file: \n')
+    f.write('snapshot_provider: \n')
     f.write('private_signing_key: \'{{ vault_private_signing_key }}\'\n')
 
 
