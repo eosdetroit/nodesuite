@@ -43,6 +43,8 @@ last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
 {% endif %}
 {% if producer_threads %}
 producer-threads = {{ producer_threads }}
+{% endif %}
+{% if txn_test_gen_threads %}
 txn-test-gen-threads = {{ txn_test_gen_threads }}
 {% endif %}
 {% for plugin in plugins %}

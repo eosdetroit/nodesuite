@@ -1,6 +1,6 @@
 ---
 rabbitmq_user: admin
-rabbitmq_vhost: hyperion
+rabbitmq_vhost: /hyperion
 redis_conf_path: /etc/redis/redis.conf
 hyp_chain_logo_url: https://bloks.io/img/chains
 hyp_api_threads: 1

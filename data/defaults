@@ -32,7 +32,7 @@ hyperion:
     setup_hyperion: yes
     setup_state_history: yes
     api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
-    hyperion_version: 3.1.0-beta.4
+    hyperion_version: 3.3.5
     rabbitmq_username: "rabbitusername"
     rabbitmq_password: '{{ vault_rabbitmq_password }}'
     http_proxy_port: 7000
