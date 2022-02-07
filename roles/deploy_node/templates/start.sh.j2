@@ -11,7 +11,7 @@
 {% set replay_flag = '--hard-replay-blockchain' if (do_replay | d() | bool) else empty_flag %}
 {% set snapshot_flag = '--snapshot' if (use_snapshot | d() | bool) else empty_flag %}
 {% set snapshot = snapshot_bin.stdout if (use_snapshot | d() | bool) else empty_flag %}
-{% set delete_all_blocks_flag = '--delete-all-blocks" if (use_snapshot | d() | bool) else empty_flag %}
+{% set delete_all_blocks_flag = '--delete-all-blocks' if (use_snapshot | d() | bool) else empty_flag %}
 {% set genesis_json_flag = '--genesis-json' if (use_genesis_json | d() | bool) else empty_flag %}
 {% set genesis_json = genesis_json_path if (use_genesis_json | d() | bool) else empty_flag %}
 {% set disable_replay_opts_flag = '--disable-replay-opts' if (setup_state_history | d() | bool) else empty_flag %} 
