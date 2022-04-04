@@ -84,6 +84,7 @@
     dest: '{{ working_dir }}/deploy/v2start.sh'
     mode: u+rwx
     force: yes
+  when: use_snapshot | bool
 
 - name: Installing nodeos quickrestart script
   template:
