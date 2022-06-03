@@ -1,0 +1,97 @@
+---
+- name: Install LightAPI reqs
+  apt:
+    force_apt_get: yes
+    update_cache: true
+    state: present
+    pkg:
+    - git
+    - make
+    - cpanminus
+    - gcc
+    - g++
+    - mariadb-server
+    - libmysqlclient-dev
+    - libdbi-perl
+    - libjson-xs-perl
+    - libjson-perl
+    - libdatetime-format-iso8601-perl
+
+
+- name: Install DBD::MariaDB perl package
+  community.general.cpanm:
+    name: DBD::MariaDB
+
+- name: Install Starman perl package
+  community.general.cpanm:
+    name: Starman
+
+- name: Install Net::WebSocket::Server perl package
+  community.general.cpanm:
+    name: Net::WebSocket::Server
+
+- name: Install Crypt::Digest::RIPEMD160 perl package
+  community.general.cpanm:
+    name: Crypt::Digest::RIPEMD160
+
+#- name: Clone LightAPI Repo
+#  git:
+#    repo: https://github.com/cc32d9/eosio_light_api.git
+#    dest: /opt/eosio_light_api
+
+#- name: Create mysql databases
+#  shell: "mysql </opt/eosio_light_api/sql/lightapi_dbcreate.sql"
+
+#- name: Add chain 
+#  shell: "sh /opt/eosio_light_api/setup/add_eos_mainnet.sh"
+
+- name: Setting up for nodejs v 13.x
+  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
+
+- name: Install NodeJS
+  apt:
+    name: nodejs
+
+- name: Install packages based on package.json.
+  community.general.npm:
+    path: /opt/eosio_light_api/wsapi
+
+- name: Adding Chronicle Consumer Socket Details
+  template:
+    src: lightapi_eos.j2
+    dest: /etc/default/lightapi_eos
+
+- name: Chain Install DBWrite
+  shell: "sh /opt/eosio_light_api/systemd/install_systemd_dbwrite.sh eos"
+
+- name: Copy LightAPI service
+  copy:
+    remote_src: yes
+    src: /opt/eosio_light_api/systemd/lightapi_api.service
+    dest: /etc/systemd/system/lightapi_api.service
+
+- name: Enabling LightAPI as a service
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: lightapi_api
+
+- name: Copy wsapi service
+  copy:
+    remote_src: yes
+    src: /opt/eosio_light_api/systemd/lightapi_wsapi@.service
+    dest: /etc/systemd/system/lightapi_wsapi.service
+
+- name: Enabling wsapi as a service
+  systemd:
+    state: started
+    daemon_reload: yes
+    name: lightapi_wsapi
+
+- name: Enabling LightAPI on specific ports
+  shell: "sh /opt/eosio_light_api/systemd/install_systemd_wsapi.sh 5101 5102 5103 5104 5105"
+
+- name: Cron job for token holder counts
+  template:
+    src: lightapi.j2
+    dest: /etc/cron.d/lightapi
