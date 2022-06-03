@@ -17,7 +17,6 @@
     - libjson-perl
     - libdatetime-format-iso8601-perl
 
-
 - name: Install DBD::MariaDB perl package
   community.general.cpanm:
     name: DBD::MariaDB
@@ -34,25 +33,34 @@
   community.general.cpanm:
     name: Crypt::Digest::RIPEMD160
 
-#- name: Clone LightAPI Repo
-#  git:
-#    repo: https://github.com/cc32d9/eosio_light_api.git
-#    dest: /opt/eosio_light_api
+- name: check if lightapi service
+  stat:
+    path: /etc/systemd/system/lightapi_api.service
+  register: __check_if_lightapi_service
 
-#- name: Create mysql databases
-#  shell: "mysql </opt/eosio_light_api/sql/lightapi_dbcreate.sql"
+- name: Clone LightAPI Repo
+  git:
+    repo: https://github.com/cc32d9/eosio_light_api.git
+    dest: /opt/eosio_light_api
+    force: yes
+  when: __check_if_lightapi_service.stat.exists == false
 
-#- name: Add chain 
-#  shell: "sh /opt/eosio_light_api/setup/add_eos_mainnet.sh"
+- name: Create mysql databases
+  shell: "mysql </opt/eosio_light_api/sql/lightapi_dbcreate.sql"
+  when: __check_if_lightapi_service.stat.exists == false
 
-- name: Setting up for nodejs v 13.x
-  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
+- name: Add chain 
+  shell: "sh /opt/eosio_light_api/setup/add_{{ name }}_mainnet.sh"
+  when: __check_if_lightapi_service.stat.exists == false
 
-- name: Install NodeJS
-  apt:
-    name: nodejs
+- name: Get Package Facts
+  package_facts:
+    manager: auto
 
-- name: Install packages based on package.json.
+- include: nodejs.yml
+  when: "'nodejs' not in ansible_facts.packages"
+
+- name: Install packages based on package.json
   community.general.npm:
     path: /opt/eosio_light_api/wsapi
 
@@ -62,34 +70,20 @@
     dest: /etc/default/lightapi_eos
 
 - name: Chain Install DBWrite
-  shell: "sh /opt/eosio_light_api/systemd/install_systemd_dbwrite.sh eos"
-
-- name: Copy LightAPI service
-  copy:
-    remote_src: yes
-    src: /opt/eosio_light_api/systemd/lightapi_api.service
-    dest: /etc/systemd/system/lightapi_api.service
+  shell: "sh /opt/eosio_light_api/systemd/install_systemd_dbwrite.sh {{ name }}"
+  when: __check_if_lightapi_service.stat.exists == false
 
 - name: Enabling LightAPI as a service
-  systemd:
-    state: started
-    daemon_reload: yes
-    name: lightapi_api
-
-- name: Copy wsapi service
-  copy:
-    remote_src: yes
-    src: /opt/eosio_light_api/systemd/lightapi_wsapi@.service
-    dest: /etc/systemd/system/lightapi_wsapi.service
-
-- name: Enabling wsapi as a service
-  systemd:
-    state: started
-    daemon_reload: yes
-    name: lightapi_wsapi
+  shell:
+    cmd: "sh /opt/eosio_light_api/systemd/install_systemd_api.sh"
+    chdir: /opt/eosio_light_api/systemd/
+  when: __check_if_lightapi_service.stat.exists == false
 
 - name: Enabling LightAPI on specific ports
-  shell: "sh /opt/eosio_light_api/systemd/install_systemd_wsapi.sh 5101 5102 5103 5104 5105"
+  shell:
+    cmd: "sh /opt/eosio_light_api/systemd/install_systemd_wsapi.sh {{ lightapi_ports }}"
+    chdir: /opt/eosio_light_api/systemd/
+  when: __check_if_lightapi_service.stat.exists == false
 
 - name: Cron job for token holder counts
   template:
