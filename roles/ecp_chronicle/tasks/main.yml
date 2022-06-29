@@ -1,0 +1,142 @@
+---
+- name: Install some pre-reqs
+  apt:
+    update_cache: true
+    state: present
+    pkg:
+    - gnupg
+    - software-properties-common
+
+- name: Add kitware apt-key
+  apt_key:
+    url: https://apt.kitware.com/keys/kitware-archive-latest.asc
+    state: present
+
+- name: add kitware repo
+  apt_repository:
+    repo: deb https://apt.kitware.com/ubuntu/ bionic main
+    state: present
+
+- name: add ubuntu-toolchain repo
+  apt_repository:
+    repo: ppa:ubuntu-toolchain-r/test
+
+- name: Install more reqs
+  apt:
+    update_cache: true
+    state: present
+    force_apt_get: yes
+    pkg:
+    - git
+    - g++-8
+    - cmake
+    - libssl-dev
+    - libgmp-dev
+    - zlib1g-dev
+    - python-dev
+    - python3-dev
+
+- name: Update Alternative Links for gcc
+  community.general.alternatives:
+    name: gcc
+    link: /usr/bin/gcc
+    path: /usr/bin/gcc-8
+    priority: 800
+
+- name: Update Alternative Links for g++
+  community.general.alternatives:
+    name: g++
+    link: /usr/bin/g++
+    path: /usr/bin/g++-8
+
+- name: Creates directory
+  file:
+    path: /opt/eos-chronicle/unpack
+    state: directory
+
+- name: Get boost tar dir
+  get_url:
+    url: https://boostorg.jfrog.io/artifactory/main/release/1.67.0/source/boost_1_67_0.tar.gz
+    dest: /opt/eos-chronicle/boost_tar.tar.gz
+    force: yes
+
+- name: Unarchiving boost archive
+  unarchive:
+    src: /opt/eos-chronicle/boost_tar.tar.gz
+    dest: /opt/eos-chronicle/unpack/
+    remote_src: yes
+
+- name: Running bootstrap script
+  shell:
+    cmd: "./bootstrap.sh"
+    chdir: /opt/eos-chronicle/unpack/boost_1_67_0/
+
+- name: Running 2nd bootstrap script
+  shell:
+    cmd: "./b2 install"
+    chdir: /opt/eos-chronicle/unpack/boost_1_67_0/
+
+- name: Clone Chronicle Repo
+  git:
+    repo: https://github.com/EOSChronicleProject/eos-chronicle.git
+    dest: /opt/eos-chronicle/build/eos-chronicle/
+    force: yes
+
+- name: Track Submodules
+  shell:
+    cmd: "git submodule update --init --recursive"
+    chdir: /opt/eos-chronicle/build/eos-chronicle/
+
+- name: Creates directory
+  file:
+    path: /opt/eos-chronicle/build/eos-chronicle/build
+    state: directory
+
+- name: Running cmake
+  shell:
+    cmd: "cmake .."
+    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+
+- name: Running make
+  shell:
+    cmd: "make"
+    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+
+- name: Running make install
+  shell:
+    cmd: "make install"
+    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+
+- name: Creates directory
+  file:
+    path: /home/eosio/chronicle-config/
+    state: directory
+    owner: eosio
+
+- name: Setting up for nodejs v 13.x
+  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
+
+- name: Install NodeJS
+  apt:
+    name: nodejs
+
+- name: Install chronicle-consumer
+  npm:
+    name: chronicle-consumer
+    global: yes
+
+- name: prometheus targets file
+  template:
+    src: targets.yml.j2
+    dest: "{{ prometheus_dir_conf }}/targets.yml"
+    mode: 0755
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+
+- name: prometheus targets file
+  template:
+    src: targets.yml.j2
+    dest: "{{ prometheus_dir_conf }}/targets.yml"
+    mode: 0755
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
