@@ -2,13 +2,12 @@
 Description=EOS Chronicle receiver
 
 [Service]
+User={{ deploy_user }}
 Type=simple
-ExecStart=/usr/local/sbin/chronicle-receiver --config-dir=/home/eosio/chronicle-config --data-dir=/home/eosio/chronicle-data
+ExecStart=/usr/local/sbin/chronicle-receiver --config-dir=/home/{{ deploy_user }}/chronicle-config --data-dir=/home/{{ deploy_user }}/chronicle-data
 TimeoutStopSec=300s
-Restart=on-success
+Restart=on-failure
 RestartSec=10
-User=eosio
-Group=eosio
 KillMode=control-group
 
 [Install]

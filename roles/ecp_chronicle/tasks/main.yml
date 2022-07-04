@@ -80,12 +80,7 @@
   git:
     repo: https://github.com/EOSChronicleProject/eos-chronicle.git
     dest: /opt/eos-chronicle/build/eos-chronicle/
-    force: yes
-
-- name: Track Submodules
-  shell:
-    cmd: "git submodule update --init --recursive"
-    chdir: /opt/eos-chronicle/build/eos-chronicle/
+    track_submodules: yes
 
 - name: Creates directory
   file:
@@ -109,9 +104,25 @@
 
 - name: Creates directory
   file:
-    path: /home/eosio/chronicle-config/
+    path: "/home/{{ deploy_user }}/chronicle-config/"
     state: directory
-    owner: eosio
+    owner: "{{ deploy_user }}"
+
+- name: chronicle-receiver service file
+  template:
+    src: chronicle-receiver.service.j2
+    dest: "/etc/systemd/system/chronicle-receiver.service"
+    mode: 0755
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+
+- name: chronicle-receiver config file
+  template:
+    src: config.ini.j2
+    dest: "/home/{{ deploy_user }}/chronicle-config/config.ini"
+    mode: 0755
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
 
 - name: Setting up for nodejs v 13.x
   shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
@@ -125,18 +136,36 @@
     name: chronicle-consumer
     global: yes
 
-- name: prometheus targets file
+- name: chronicle-consumer app.js 
   template:
-    src: targets.yml.j2
-    dest: "{{ prometheus_dir_conf }}/targets.yml"
+    src: app.js.j2
+    dest: "/usr/lib/node_modules/chronicle-consumer/app.js"
     mode: 0755
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
 
-- name: prometheus targets file
+- name: chronicle-consumer service
   template:
-    src: targets.yml.j2
-    dest: "{{ prometheus_dir_conf }}/targets.yml"
+    src: chronicle-consumer.service.j2
+    dest: "/etc/systemd/system/chronicle-consumer.service"
     mode: 0755
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+  become_user: root
+
+- name: Starting chronicle-receiver
+  service:
+    name: chronicle-receiver
+    enabled: yes
+    state: restarted
+
+- name: Starting chronicle-consumer
+  service:
+    name: chronicle-consumer
+    enabled: yes
+    state: restarted
