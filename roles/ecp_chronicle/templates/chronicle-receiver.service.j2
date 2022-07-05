@@ -4,7 +4,7 @@ Description=EOS Chronicle receiver
 [Service]
 User={{ deploy_user }}
 Type=simple
-ExecStart=/usr/local/sbin/chronicle-receiver --config-dir=/home/{{ deploy_user }}/chronicle-config --data-dir=/home/{{ deploy_user }}/chronicle-data
+ExecStart=/usr/local/sbin/chronicle-receiver --config-dir={{ working_dir }}/chronicle-config --data-dir={{ working_dir }}/chronicle-data
 TimeoutStopSec=300s
 Restart=on-failure
 RestartSec=10

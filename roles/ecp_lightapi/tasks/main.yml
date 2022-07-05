@@ -41,16 +41,16 @@
 - name: Clone LightAPI Repo
   git:
     repo: https://github.com/cc32d9/eosio_light_api.git
-    dest: /opt/eosio_light_api
+    dest: "{{ working_dir }}/eosio_light_api"
     force: yes
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Create mysql databases
-  shell: "mysql </opt/eosio_light_api/sql/lightapi_dbcreate.sql"
+  shell: "mysql <{{ working_dir }}/eosio_light_api/sql/lightapi_dbcreate.sql"
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Add chain 
-  shell: "sh /opt/eosio_light_api/setup/add_{{ name }}_mainnet.sh"
+  shell: "sh {{ working_dir }}/eosio_light_api/setup/add_{{ name }}_mainnet.sh"
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Get Package Facts
@@ -62,7 +62,7 @@
 
 - name: Install packages based on package.json
   community.general.npm:
-    path: /opt/eosio_light_api/wsapi
+    path: "{{ working_dir }}/eosio_light_api/wsapi"
 
 - name: Adding Chronicle Consumer Socket Details
   template:
@@ -70,19 +70,19 @@
     dest: /etc/default/lightapi_eos
 
 - name: Chain Install DBWrite
-  shell: "sh /opt/eosio_light_api/systemd/install_systemd_dbwrite.sh {{ name }}"
+  shell: "sh {{ working_dir }}/eosio_light_api/systemd/install_systemd_dbwrite.sh {{ name }}"
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Enabling LightAPI as a service
   shell:
-    cmd: "sh /opt/eosio_light_api/systemd/install_systemd_api.sh"
-    chdir: /opt/eosio_light_api/systemd/
+    cmd: "sh {{ working_dir }}/eosio_light_api/systemd/install_systemd_api.sh"
+    chdir: "{{ working_dir }}/eosio_light_api/systemd/"
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Enabling LightAPI on specific ports
   shell:
-    cmd: "sh /opt/eosio_light_api/systemd/install_systemd_wsapi.sh {{ lightapi_ports }}"
-    chdir: /opt/eosio_light_api/systemd/
+    cmd: "sh {{ working_dir }}/eosio_light_api/systemd/install_systemd_wsapi.sh {{ lightapi_ports }}"
+    chdir: "{{ working_dir }}/eosio_light_api/systemd/"
   when: __check_if_lightapi_service.stat.exists == false
 
 - name: Cron job for token holder counts

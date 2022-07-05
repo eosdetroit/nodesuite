@@ -1,0 +1,25 @@
+---
+- hosts: '{{ target }}'
+  become: yes
+  become_user: root
+  roles:
+    - { role: ecp_lightapi }
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+    - 'stage_vars/{{ name }}/{{ stage }}/vault.yml'
+  tags: [ never, lightapi ]
+
+- hosts: '{{ target }}'
+  become: yes
+  become_user: root
+  roles:
+    - { role: ecp_chronicle }
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+    - 'stage_vars/{{ name }}/{{ stage }}/vault.yml'
+  tags: [ never, chronicle ]
+
+#####
+# Ansible docs on using tags: https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html
+# add --tags "lightapi" to run
+#####

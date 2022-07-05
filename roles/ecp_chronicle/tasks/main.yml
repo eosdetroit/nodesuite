@@ -51,60 +51,60 @@
 
 - name: Creates directory
   file:
-    path: /opt/eos-chronicle/unpack
+    path: "{{ working_dir }}/eos-chronicle/unpack"
     state: directory
 
 - name: Get boost tar dir
   get_url:
     url: https://boostorg.jfrog.io/artifactory/main/release/1.67.0/source/boost_1_67_0.tar.gz
-    dest: /opt/eos-chronicle/boost_tar.tar.gz
+    dest: "{{ working_dir }}/eos-chronicle/boost_tar.tar.gz"
     force: yes
 
 - name: Unarchiving boost archive
   unarchive:
-    src: /opt/eos-chronicle/boost_tar.tar.gz
-    dest: /opt/eos-chronicle/unpack/
+    src: "{{ working_dir }}/eos-chronicle/boost_tar.tar.gz"
+    dest: "{{ working_dir }}/eos-chronicle/unpack/"
     remote_src: yes
 
 - name: Running bootstrap script
   shell:
     cmd: "./bootstrap.sh"
-    chdir: /opt/eos-chronicle/unpack/boost_1_67_0/
+    chdir: "{{ working_dir }}/eos-chronicle/unpack/boost_1_67_0/"
 
 - name: Running 2nd bootstrap script
   shell:
     cmd: "./b2 install"
-    chdir: /opt/eos-chronicle/unpack/boost_1_67_0/
+    chdir: "{{ working_dir }}/eos-chronicle/unpack/boost_1_67_0/"
 
 - name: Clone Chronicle Repo
   git:
     repo: https://github.com/EOSChronicleProject/eos-chronicle.git
-    dest: /opt/eos-chronicle/build/eos-chronicle/
+    dest: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/"
     track_submodules: yes
 
 - name: Creates directory
   file:
-    path: /opt/eos-chronicle/build/eos-chronicle/build
+    path: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/build"
     state: directory
 
 - name: Running cmake
   shell:
     cmd: "cmake .."
-    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+    chdir: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/build/"
 
 - name: Running make
   shell:
     cmd: "make"
-    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+    chdir: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/build/"
 
 - name: Running make install
   shell:
     cmd: "make install"
-    chdir: /opt/eos-chronicle/build/eos-chronicle/build/
+    chdir: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/build/"
 
 - name: Creates directory
   file:
-    path: "/home/{{ deploy_user }}/chronicle-config/"
+    path: "{{ working_dir }}/chronicle-config/"
     state: directory
     owner: "{{ deploy_user }}"
 
@@ -119,7 +119,7 @@
 - name: chronicle-receiver config file
   template:
     src: config.ini.j2
-    dest: "/home/{{ deploy_user }}/chronicle-config/config.ini"
+    dest: "{{ working_dir }}/chronicle-config/config.ini"
     mode: 0755
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
