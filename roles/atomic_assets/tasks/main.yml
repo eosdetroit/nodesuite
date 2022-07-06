@@ -83,7 +83,7 @@
     update_cache: yes
 
 #Setup DB/User
-- name: Install requirements
+- name: Install collection requirements
   become: no
   local_action: "command ansible-galaxy collection install community.postgresql"
 
@@ -92,24 +92,37 @@
     name: python3-pip
     update_cache: yes
     state: present
+
+- name: psycopg2 requirements
+  apt:
+    name:
+     - python3-dev
+     - libpq-dev
   
 - name: Make sure psycopg2 is installed
   pip:
     name: psycopg2
-    state: present
+    extra_args: "--no-binary :all:"
+
+- name: Create a new database named atomicsauce
+  become: yes
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: atomicsauce
 
 - name: Create atomicuser user with encrypted password
+  become: yes
+  become_user: postgres
   community.postgresql.postgresql_user:
     name: atomicuser
     password: "atomicpassword54123"
     encrypted: yes
 
-- name: Create a new database named atomicsauce
-  community.postgresql.postgresql_db:
-    name: atomicsauce
-
 - name: grant all privileges on database atomicsauce to atomicuser
+  become: yes
+  become_user: postgres
   community.postgresql.postgresql_privs:
+    type: database
     db: atomicsauce
     privs: ALL
     roles: atomicuser
