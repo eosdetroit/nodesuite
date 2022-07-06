@@ -1,0 +1,4 @@
+---
+collections:
+# Install PostgreSQL module for atomic-assets playbook
+  - name: community.postgresql
