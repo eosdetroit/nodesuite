@@ -1,0 +1,53 @@
+[
+  {
+    "name": "atomic-1",
+
+    "server_addr": "0.0.0.0",
+    "server_port": 9001,
+
+    "start_block": 0,
+    "stop_block": 0,
+    "irreversible_only": false,
+
+    "ship_prefetch_blocks": 50,
+    "ship_min_block_confirmation": 30,
+    "ship_ds_queue_size": 20,
+
+    "db_group_blocks": 10,
+
+    "ds_ship_threads": 4,
+
+    "modules": [],
+
+    "contracts": [
+      {
+        "handler": "atomicassets",
+        "args": {
+          "atomicassets_account": "atomicassets",
+          "store_transfers": true,
+          "store_logs": true
+        }
+      },
+      {
+        "handler": "delphioracle",
+        "args": {
+          "delphioracle_account": "delphioracle"
+        }
+      },
+      {
+        "handler": "atomicmarket",
+        "args": {
+          "atomicmarket_account": "atomicmarket",
+          "store_logs": true
+        }
+      },
+      {
+        "handler": "atomictools",
+        "args": {
+          "atomictools_account": "atomictoolsx",
+          "store_logs": true
+        }
+      }
+    ]
+  }
+]

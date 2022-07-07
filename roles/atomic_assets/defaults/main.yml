@@ -1,0 +1,12 @@
+db_user: aa_user
+db_password: aa_pw_!234_
+db_name: aa_database
+provider_name: Provider Name # Provider which is show in the endpoint documentation
+provider_url: provider.com
+server_addr: 0.0.0.0 # Server address to bind to
+server_name: wax.api.atomicassets.io # Server name which is shown in the documentation
+server_port: 9000
+# Configs for nodeos endpoint
+http_addr: 127.0.0.1
+http_port: 8888
+ws_port: 8080
