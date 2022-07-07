@@ -1,5 +1,5 @@
 ---
-- name: Install LightAPI reqs
+- name: Install LightAPI dependencies
   apt:
     force_apt_get: yes
     update_cache: true
@@ -57,8 +57,12 @@
   package_facts:
     manager: auto
 
-- include: nodejs.yml
-  when: "'nodejs' not in ansible_facts.packages"
+- name: Setting up for nodejs v 13.x
+  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
+
+- name: Install NodeJS
+  apt:
+    name: nodejs
 
 - name: Install packages based on package.json
   community.general.npm:

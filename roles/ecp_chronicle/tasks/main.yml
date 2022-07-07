@@ -1,5 +1,5 @@
 ---
-- name: Install some pre-reqs
+- name: Install dependencies
   apt:
     update_cache: true
     state: present
@@ -21,7 +21,7 @@
   apt_repository:
     repo: ppa:ubuntu-toolchain-r/test
 
-- name: Install more reqs
+- name: Install dependencies
   apt:
     update_cache: true
     state: present
@@ -49,12 +49,12 @@
     link: /usr/bin/g++
     path: /usr/bin/g++-8
 
-- name: Creates directory
+- name: Create directory
   file:
     path: "{{ working_dir }}/eos-chronicle/unpack"
     state: directory
 
-- name: Get boost tar dir
+- name: Get boost tar url
   get_url:
     url: https://boostorg.jfrog.io/artifactory/main/release/1.67.0/source/boost_1_67_0.tar.gz
     dest: "{{ working_dir }}/eos-chronicle/boost_tar.tar.gz"
@@ -102,13 +102,13 @@
     cmd: "make install"
     chdir: "{{ working_dir }}/eos-chronicle/build/eos-chronicle/build/"
 
-- name: Creates directory
+- name: Create directory
   file:
     path: "{{ working_dir }}/chronicle-config/"
     state: directory
     owner: "{{ deploy_user }}"
 
-- name: chronicle-receiver service file
+- name: Template chronicle-receiver.service file
   template:
     src: chronicle-receiver.service.j2
     dest: "/etc/systemd/system/chronicle-receiver.service"
@@ -116,7 +116,7 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
 
-- name: chronicle-receiver config file
+- name: Template chronicle-receiver config file
   template:
     src: config.ini.j2
     dest: "{{ working_dir }}/chronicle-config/config.ini"
@@ -124,10 +124,10 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
 
-- name: Setting up for nodejs v 13.x
+- name: Setup Nodejs v 13.x
   shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
 
-- name: Install NodeJS
+- name: Install NodeJS package
   apt:
     name: nodejs
 

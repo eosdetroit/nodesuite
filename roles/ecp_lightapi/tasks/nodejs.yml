@@ -1,7 +1,0 @@
----
-- name: Setting up for nodejs v 13.x
-  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
-
-- name: Install NodeJS
-  apt:
-    name: nodejs
