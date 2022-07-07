@@ -1,0 +1,9 @@
+---
+- hosts: '{{ target }}'
+  become: yes
+  become_user: root
+  roles:
+    - { role: ecp_lightapi }
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+    - 'stage_vars/{{ name }}/{{ stage }}/vault.yml'
