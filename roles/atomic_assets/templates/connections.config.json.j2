@@ -10,9 +10,9 @@
     "host": "127.0.0.1",
     "port": 6379
   },
-  "chain": {
-    "name": "wax-mainnet",
-    "chain_id": "1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4",
+  "chain":
+    "name": "{{ name }}-{% if stage=="prod" %}main{% else %}{{ stage }}{% endif %}net",
+    "chain_id": "{{ chain_id }}",
     "http": "http://{{ http_addr }}:{{ http_port }}",
     "ship": "ws://{{ http_addr }}:{{ ws_port }}"
   }
