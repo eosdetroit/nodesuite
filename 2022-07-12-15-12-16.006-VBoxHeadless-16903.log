@@ -1,0 +1,12 @@
+Log created: 2022-07-12T15:12:16.061834000Z
+Process ID:  16903 (0x4207)
+Parent PID:  16095 (0x3edf)
+Executable:  /usr/lib/virtualbox/VBoxHeadless
+Arg[0]: /usr/lib/virtualbox/VBoxHeadless
+Arg[1]: --comment
+Arg[2]: nodesuite_default_1657293551364_99239
+Arg[3]: --startvm
+Arg[4]: 45dbddfd-2024-4596-a5d2-ec4251c74fa0
+Arg[5]: --vrde
+Arg[6]: config
+AddRef: illegal refcnt=3221225469 state=2
