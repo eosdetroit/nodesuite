@@ -71,7 +71,7 @@
 - name: Adding Chronicle Consumer Socket Details
   template:
     src: lightapi_eos.j2
-    dest: /etc/default/lightapi_eos
+    dest: "/etc/default/lightapi_{{ name }}"
 
 - name: Chain Install DBWrite
   shell: "sh /opt/eosio_light_api/systemd/install_systemd_dbwrite.sh {{ name }}"
