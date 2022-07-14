@@ -10,7 +10,7 @@
     "host": "127.0.0.1",
     "port": 6379
   },
-  "chain":
+  "chain": {
     "name": "{{ name }}-{% if stage=="prod" %}main{% else %}{{ stage }}{% endif %}net",
     "chain_id": "{{ chain_id }}",
     "http": "http://{{ http_addr }}:{{ http_port }}",

@@ -133,18 +133,6 @@
     name: pm2
     global: yes
 
-- name: Starting filler
-  become_user: "{{ deploy_user }}"
-  shell:
-    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-filler"
-    chdir: "{{ working_dir }}/src/eosio-contract-api"
-
-- name: Starting filler
-  become_user: "{{ deploy_user }}"
-  shell:
-    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-server"
-    chdir: "{{ working_dir }}/src/eosio-contract-api"
-
 - name: server.config.json
   template:
     src: server.config.json.j2
@@ -165,3 +153,15 @@
     dest: "{{ working_dir }}/src/eosio-contract-api/config/connections.config.json"
     mode: 0755
     owner: "{{ deploy_user }}"
+
+- name: Starting filler
+  become_user: "{{ deploy_user }}"
+  shell:
+    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-filler"
+    chdir: "{{ working_dir }}/src/eosio-contract-api"
+
+- name: Starting filler
+  become_user: "{{ deploy_user }}"
+  shell:
+    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-server"
+    chdir: "{{ working_dir }}/src/eosio-contract-api"

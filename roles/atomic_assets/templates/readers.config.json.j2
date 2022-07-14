@@ -2,10 +2,10 @@
   {
     "name": "atomic-1",
 
-    "server_addr": "0.0.0.0",
-    "server_port": 9001,
+    "server_addr": "{{ reader_addr }}",
+    "server_port": {{ reader_port }},
 
-    "start_block": 0,
+    "start_block": {{ start_block }},
     "stop_block": 0,
     "irreversible_only": false,
 
