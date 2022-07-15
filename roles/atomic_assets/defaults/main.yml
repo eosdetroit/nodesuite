@@ -1,0 +1,29 @@
+#Postgres Configuration
+db_user: aa_user
+db_password: aa_pw_!234_
+db_name: aa_database
+
+#EOSIO State History Configuration
+http_addr: 127.0.0.1
+http_port: 8888
+ws_port: 8080
+
+#Server Configuration
+provider_name: Provider Name
+provider_url: provider.com
+server_addr: 0.0.0.0 # Server address to bind to
+server_name: wax.api.atomicassets.io
+server_port: 9012
+metrics_port: 9013
+
+#Reader Configuration
+reader_addr: 0.0.0.0
+reader_port: 9011
+start_block: 0
+
+#For atomicassets / atomicmarket you should specify the following start blocks
+#   wax-mainnet: 64000000
+#   wax-testnet: 35795000 (Here you need to use it otherwise it will break)
+#   eos-mainnet: 99070000
+#   proton-mainnet: 50289000
+#   proton-testnet: 53440000
