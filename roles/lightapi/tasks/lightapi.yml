@@ -49,6 +49,10 @@
   shell: "mysql </opt/eosio_light_api/sql/lightapi_dbcreate.sql"
   when: __check_if_lightapi_service.stat.exists == false
 
+- name: Create mysql tables
+  shell: "sh /opt/eosio_light_api/sql/create_tables.sh {{ name }}"
+  when: __check_if_lightapi_service.stat.exists == false
+
 - name: Add chain 
   shell: "sh /opt/eosio_light_api/setup/add_{{ name }}_mainnet.sh"
   when: __check_if_lightapi_service.stat.exists == false
