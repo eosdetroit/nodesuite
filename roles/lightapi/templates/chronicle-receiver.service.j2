@@ -4,10 +4,10 @@ Description=EOS Chronicle receiver
 [Service]
 User={{ deploy_user }}
 Type=simple
+After=network.target
 ExecStart=/usr/local/sbin/chronicle-receiver --config-dir={{ working_dir }}/chronicle-config --data-dir={{ working_dir }}/chronicle-data
-TimeoutStopSec=300s
-Restart=on-failure
-RestartSec=10
+Restart=always
+RestartSec=10s
 KillMode=control-group
 
 [Install]

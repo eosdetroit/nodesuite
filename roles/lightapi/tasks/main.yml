@@ -1,4 +1,4 @@
----
+--- # Installing Chronicle
 - name: Install dependencies
   apt:
     update_cache: true
@@ -112,43 +112,13 @@
   template:
     src: chronicle-receiver.service.j2
     dest: "/etc/systemd/system/chronicle-receiver.service"
-    mode: 0755
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_group }}"
+
 
 - name: Template chronicle-receiver config file
   template:
     src: config.ini.j2
     dest: "{{ working_dir }}/chronicle-config/config.ini"
-    mode: 0755
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_group }}"
-
-- name: Setup Nodejs v 13.x
-  shell: "curl -sL https://deb.nodesource.com/setup_13.x | bash -"
-
-- name: Install NodeJS package
-  apt:
-    name: nodejs
-
-- name: Install chronicle-consumer
-  npm:
-    name: chronicle-consumer
-    global: yes
-
-- name: chronicle-consumer app.js 
-  template:
-    src: app.js.j2
-    dest: "/usr/lib/node_modules/chronicle-consumer/app.js"
-    mode: 0755
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_group }}"
-
-- name: chronicle-consumer service
-  template:
-    src: chronicle-consumer.service.j2
-    dest: "/etc/systemd/system/chronicle-consumer.service"
-    mode: 0755
+    mode: 0644
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
 
@@ -164,8 +134,4 @@
     enabled: yes
     state: restarted
 
-- name: Starting chronicle-consumer
-  service:
-    name: chronicle-consumer
-    enabled: yes
-    state: restarted
+- include: lightapi.yml
