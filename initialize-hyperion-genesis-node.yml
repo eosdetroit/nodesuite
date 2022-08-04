@@ -12,19 +12,6 @@
 - hosts: '{{ target }}'
   strategy: free
   become: yes
-  become_user: '{{ deploy_user }}'
-  vars:
-    use_genesis_json: yes
-  vars_files:
-    - stage_vars/{{ name }}/{{ stage }}/vars.yml
-    - stage_vars/{{ name }}/{{ stage }}/vault.yml
-  roles:
-    - { role: build_source }
-    - { role: deploy_node }
-
-- hosts: '{{ target }}'
-  strategy: free
-  become: yes
   become_user: root
   vars_files:
     - stage_vars/{{ name }}/{{ stage }}/vars.yml
