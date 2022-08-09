@@ -1,6 +1,4 @@
 ---
-rabbitmq_user: admin
-rabbitmq_vhost: hyperion
 redis_conf_path: /etc/redis/redis.conf
 hyp_chain_logo_url: https://bloks.io/img/chains
 hyp_api_threads: 1
@@ -27,12 +25,13 @@ hyp_process_deltas: true
 hyp_max_inline: 20
 hyperion_version: v3.1.5-1
 api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
+
+rabbitmq_vhost: hyperion
 rabbitmq_user: changemeplz
 rabbitmq_password: plzusevault
-es_data_dir: /opt/eosio/deploy/elasticsearch
+
 es_conf_path: /etc/elasticsearch/elasticsearch.yml
 es_jvm_opts_path: /etc/elasticsearch/jvm.options
 es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
-
 hyp_es_enable_xpack: true
 jvm_heap_size: 4g

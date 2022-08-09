@@ -41,7 +41,6 @@ hyperion:
     es_master_node: true
     es_data_node: false
     hyp_es_version: 7.8.1
-    es_data_dir: /opt/eosio/deploy/elasticsearch
     es_conf_path: /etc/elasticsearch/elasticsearch.yml
     es_jvm_opts_path: /etc/elasticsearch/jvm.options
     es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf

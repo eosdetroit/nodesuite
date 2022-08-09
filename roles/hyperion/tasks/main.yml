@@ -54,6 +54,7 @@
   command: pm2 startup
   args:
     creates: /etc/systemd/system/pm2-root.service
+
 - name: Enables the rabbitmq_management plugin
   rabbitmq_plugin:
     names: rabbitmq_management
@@ -94,7 +95,6 @@
 
 - name: Configure Elasticsearch - elasticsearch.yml
   shell: 'sudo sed -ie "s/#cluster.name: my-application/cluster.name: hyperionCluster/; s/#bootstrap.memory_lock: true/bootstrap.memory_lock: true/" {{ es_conf_path }}'
-  shell: 'sudo cat /etc/elasticsearch/elasticsearch.yml'
   args:
     executable: /bin/bash
   become: yes
@@ -144,7 +144,7 @@
   become: yes
   become_user: '{{ deploy_user }}'
 
-- name: Retrieve auto-generated elasticsearch user credentials. 
+- name: Retrieve auto-generated elasticsearch user credentials.
   shell: awk <elastic_pass.txt '/PASSWORD elastic =/ {print $4}'
   args:
     chdir: '{{ working_dir }}/src/Hyperion-History-API'
@@ -166,7 +166,7 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_group }}"
 
-- name: Configure Hyperion {{ name}}.config.json
+- name: Configure Hyperion {{ name }}.config.json
   template:
     src: config.json.j2
     dest: "{{ working_dir }}/src/Hyperion-History-API/chains/{{ name }}.config.json"
