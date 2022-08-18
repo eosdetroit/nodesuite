@@ -1,37 +1,4 @@
 ---
-- name: Get apt key dependencies
-  apt_key: url={{ item }}
-  with_items:
-    - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-
-- name: Get apt key dependencies
-  apt_key: url={{ item }}
-  with_items:
-    - https://www.rabbitmq.com/rabbitmq-release-signing-key.asc
-    - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
-
-- name: Add apt repositories
-  apt_repository: repo={{ item }}
-  with_items:
-    - deb https://deb.nodesource.com/node_13.x bionic main
-    - deb-src https://deb.nodesource.com/node_13.x bionic main
-
-- name: Install Hyperion-History-API dependencies
-  apt:
-    name:
-      - default-jre
-      - apt-transport-https
-      - rabbitmq-server
-      - redis-server
-      - nodejs
-    state: latest
-    update_cache: yes
-
-- name: Install PM2
-  npm:
-    name: pm2@latest
-    global: yes
-
 - name: Checking out Hyperion History API
   git:
     repo: "{{ api_git_repo }}"
@@ -129,13 +96,11 @@
   become: yes
   become_user: "{{ deploy_user }}"
 
-- name: Starting Elasticsearch
-  service:
-    name: elasticsearch
-    enabled: yes
+- name: Reload daemon and start elasticsearch
+  systemd:
     state: restarted
-  become: yes
-  become_user: root
+    daemon_reload: yes
+    name: elasticsearch
 
 - name: Auto-generate Elasticsearch User
   shell: 'echo "y" | sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto > elastic_pass.txt'
