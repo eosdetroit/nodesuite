@@ -32,7 +32,7 @@ hyperion:
     setup_hyperion: yes
     setup_state_history: yes
     api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
-    hyperion_version: 3.1.5
+    hyperion_version: v3.1.5-1
     rabbitmq_username: "rabbitusername"
     rabbitmq_password: '{{ vault_rabbitmq_password }}'
     http_proxy_port: 7000
@@ -41,12 +41,9 @@ hyperion:
     es_master_node: true
     es_data_node: false
     hyp_es_version: 7.8.1
-    es_data_dir: /opt/eosio/deploy/elasticsearch
     es_conf_path: /etc/elasticsearch/elasticsearch.yml
     es_jvm_opts_path: /etc/elasticsearch/jvm.options
     es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
-    hyp_es_api_basic_auth_username: "elastic"
-    hyp_es_api_basic_auth_password: '{{ vault_es_api_basic_auth_password }}'
     hyp_es_enable_xpack: true
     jvm_heap_size: 8g
 
