@@ -23,7 +23,7 @@ hyp_disable_reading: false
 hyp_disable_indexing: false
 hyp_process_deltas: true
 hyp_max_inline: 20
-hyperion_version: v3.1.5-1
+hyperion_version: v3.3.5
 api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
 
 rabbitmq_vhost: hyperion
