@@ -68,13 +68,13 @@ fio:
     name: fio
     token_symbol: FIO
     git_repo: https://github.com/fioprotocol/fio.git
-    version: v3.2.0
+    version: v3.3.0
     prebuilt: yes
-    package: fioprotocol-3.2.0-ubuntu-18.04-amd64.deb
+    package: fioprotocol-3.3.0-ubuntu-18.04-amd64.deb
     bin_package: yes
     bin_src: local
     pkg_install_path: /usr/local/bin
-    cli_bin: fio-cleos
+    cli_bin: clio
     keosd_bin: fio-wallet
     nodeos_bin: fio-nodeos
     http_max_response_time_ms:
