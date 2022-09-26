@@ -104,7 +104,7 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v2.0.13wax01
+    version: v3.1.0
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
@@ -136,7 +136,7 @@ all:
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8887
     genesis_json_path: /opt/eosio/deploy/genesis.json
-    git_repo: https://github.com/EOSIO/eos.git
+    git_repo: https://github.com/AntelopeIO/leap.git
     peer_pubkey: ''
     peer_privkey: ''
     peer_keys: ''
@@ -146,9 +146,9 @@ all:
     prebuilt: yes
     bin_package: yes
     bin_src: remote
-    bin_package_base_url: https://github.com/eosio/eos/releases/download
-    version: v2.0.13
-    package: eosio_2.0.13-1-ubuntu-18.04_amd64.deb
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    version: v3.3.1
+    package: leap-3.1.1-ubuntu18.04-x86_64.deb
     build_script: eosio_build.sh
     apply_patch: ''
     force_build: ''
