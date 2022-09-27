@@ -15,7 +15,7 @@
 
 - name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
   file:
-    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}/{{ nodeos_bin }}'
+    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}'
     path: '{{ working_dir }}/deploy/nodeos'
     state: link
     force: yes
@@ -23,7 +23,7 @@
 
 - name: Linking {{ cli_bin }} {{ version }} into dist directory
   file:
-    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}/{{ cli_bin }}'
+    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}'
     path: '{{ working_dir }}/dist/{{ cli_bin }}'
     state: link
     force: yes

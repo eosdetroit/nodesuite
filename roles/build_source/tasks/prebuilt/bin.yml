@@ -30,7 +30,7 @@
 
 - name: Preparing to version programs
   file:
-    path: '{{ working_dir }}/versions/{{ version }}/{{ item }}'
+    path: '{{ working_dir }}/versions/{{ version }}/'
     state: directory
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
@@ -38,12 +38,15 @@
     - '{{ nodeos_bin }}'
     - '{{ cli_bin }}'
     - '{{ keosd_bin }}'
+    - '{{ blocklog_bin }}'
+    - '{{ trace_api_bin }}'
+
 
 - name: Versioning programs
   copy:
     remote_src: yes
     src: '{{ pkg_install_path }}/{{ item }}'
-    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
     mode: u+rwx
@@ -53,3 +56,5 @@
     - '{{ nodeos_bin }}'
     - '{{ cli_bin }}'
     - '{{ keosd_bin }}'
+    - '{{ blocklog_bin }}'
+    - '{{ trace_api_bin }}'
