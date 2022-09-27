@@ -112,7 +112,7 @@ wax:
     package: wax
     apt_package: yes
     bin_package: no
-    pkg_gpg_key: https://apt.waxsweden.org/key
+    pkg_gpg_key: https://apt.waxsweden.org/keyansibl
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
     wasm_runtime: eos-vm-jit
     last_block_time_offset_us: -300000
@@ -145,7 +145,7 @@ all:
     wasm_runtime: eos-vm-jit
     prebuilt: yes
     bin_package: yes
-    bin_src: remote
+    bin_src: local
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
     version: v3.1.1
     package: leap-3.1.1-ubuntu18.04-x86_64.deb
