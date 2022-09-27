@@ -110,8 +110,8 @@ wax:
     claim_action: claimgbmprod
     prebuilt: yes
     package: wax
-    apt_package: yes
-    bin_package: no
+    apt_package: no
+    bin_package: yes
     pkg_gpg_key: https://apt.waxsweden.org/keyansibl
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
     wasm_runtime: eos-vm-jit
