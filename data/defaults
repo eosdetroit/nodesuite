@@ -104,16 +104,17 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v3.1.0
-    chain_state_db_size_mb: 32768
+    version: v3.1.0wax02
+    chain_state_db_size_mb: 61440
     snapshot_provider: sweden
     claim_action: claimgbmprod
     prebuilt: yes
-    package: wax
+    package: wax-leap-3.1.0wax02-ubuntu20.04-x86_64.deb
     apt_package: no
     bin_package: yes
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
+    package: wax-leap-3.1.0wax02-ubuntu20.04-x86_64.deb
     wasm_runtime: eos-vm-jit
     last_block_time_offset_us: -300000
     cpu_effort_percent: 40

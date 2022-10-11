@@ -373,13 +373,13 @@ def setInventoryGroupVars(base_dir, overwrite):
     initializeConfig(path.join(base_dir, token.name, 'vars.yml'), overwrite)  
 
     f = open(path.join(base_dir, token.name, 'vars.yml'), 'a+')
-    f.write(f'name: {token.name}\n')
-    f.write(f'token_symbol: {token.value}\n')
+    with open('./data/defaults', 'r') as file:
+        defaults = yaml.load(file, Loader=yaml.FullLoader)
+        for default in defaults['wax']:
+            pass
+            f.write(f'{default}: {defaults["wax"][default]}\n')
 
-    #TODO: remove me? ask if you intend to snep shawt?
-    f.write(f'snapshot_base_url: https://snapshots.eossweden.org/snapshots/aca376/1.8\n')
-    f.write(f'snapshot_file: snapshot-73243379.bin\n')
-    f.write(f'snapshot_provider: nodetools\n')
+    
 
 def setEnvironmentStageVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)
