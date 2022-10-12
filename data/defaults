@@ -147,8 +147,8 @@ all:
     bin_package: yes
     bin_src: local
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
-    version: v3.1.1
-    package: leap-3.1.1-ubuntu18.04-x86_64.deb
+    version: v3.1.2
+    package: leap-3.1.2-ubuntu20.04-x86_64.deb
     build_script: eosio_build.sh
     apply_patch: ''
     force_build: ''
