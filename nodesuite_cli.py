@@ -375,9 +375,9 @@ def setInventoryGroupVars(base_dir, overwrite):
     f = open(path.join(base_dir, token.name, 'vars.yml'), 'a+')
     with open('./data/defaults', 'r') as file:
         defaults = yaml.load(file, Loader=yaml.FullLoader)
-        for default in defaults['wax']:
+        for default in defaults[token.name]:
             pass
-            f.write(f'{default}: {defaults["wax"][default]}\n')
+            f.write(f'{default}: {defaults[token.name][default]}\n')
 
     
 
