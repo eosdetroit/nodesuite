@@ -7,4 +7,6 @@ pkg_install_path: /usr/bin
 nodeos_bin: nodeos
 cli_bin: cleos
 keosd_bin: keosd
+blocklog_bin: eosio-blocklog
+trace_api_bin: trace_api_util
 patches:

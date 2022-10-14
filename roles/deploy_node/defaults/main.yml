@@ -56,7 +56,6 @@ hyperion_deserializers: 1
 hyp_deserializer_threads: 1
 hyp_es_idx_queues: 1
 hyp_es_ad_idx_queues: 1
-reversible_blocks_db_size_mb: 2048
 last_block_time_offset_us:
 last_block_cpu_effort_percent:
 cpu_effort_percent:

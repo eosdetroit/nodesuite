@@ -104,16 +104,16 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v2.0.13wax01
+    version: v3.1.2
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
     prebuilt: yes
-    package: wax
-    apt_package: yes
-    bin_package: no
+    apt_package: no
+    bin_package: yes
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
+    package: wax-leap-3.1.2-ubuntu20.04-x86_64.deb
     wasm_runtime: eos-vm-jit
     last_block_time_offset_us: -300000
     cpu_effort_percent: 40
@@ -136,7 +136,7 @@ all:
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8887
     genesis_json_path: /opt/eosio/deploy/genesis.json
-    git_repo: https://github.com/EOSIO/eos.git
+    git_repo: https://github.com/AntelopeIO/leap.git
     peer_pubkey: ''
     peer_privkey: ''
     peer_keys: ''
@@ -145,10 +145,10 @@ all:
     wasm_runtime: eos-vm-jit
     prebuilt: yes
     bin_package: yes
-    bin_src: remote
-    bin_package_base_url: https://github.com/eosio/eos/releases/download
-    version: v2.0.13
-    package: eosio_2.0.13-1-ubuntu-18.04_amd64.deb
+    bin_src: local
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    version: v3.1.2
+    package: leap-3.1.2-ubuntu20.04-x86_64.deb
     build_script: eosio_build.sh
     apply_patch: ''
     force_build: ''
@@ -158,4 +158,6 @@ all:
     nodeos_bin: nodeos
     cli_bin: cleos
     keosd_bin: keosd
+    blocklog_bin: eosio-blocklog
+    trace_api_bin: trace_api_util
     testnet_name: ''
