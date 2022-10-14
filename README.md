@@ -59,7 +59,7 @@ Vagrant should take a minute to spin up and you're ready to run the ansible play
 Once Vagrant is running, you can run playbooks to set up the guest Ubuntu 18.04 virtual machine. For example, to sync a WAX node from genesis on the VM, you could run the following:
 
 ```
-ansible-playbook -v initialize-eosio-genesis-node.yml -i inventories/wax.yml -e "target=dev"
+ansible-playbook -v initialize-leap-genesis-node.yml -i inventories/wax.yml -e "target=dev"
 ```
 
 this command will look in the `inventories/wax.yml` file for all hosts under the `dev` group, which includes `vagrant`. Then it looks for all of the groups `vagrant` is a host in and uses that to compose the right playbooks to run to configure that particular node. What this means is that adding additional capabilities to your node can be as simple as adding the node's hostname into a particular group and overriding the default configs with your own. If you want to change the type of node being deployed to your Vagrant-managed VM, just modify the groups that `vagrant` is added to in your inventory files.
@@ -82,12 +82,12 @@ The first argument is the name of the playbook to run.
 
 The following playbooks are provided to manage various aspects of the node lifecycle, such as: initial setup and configuration of a new host, downloading blockchain blocks and state, updating Leap versions and configs, and replaying a node.
 
-1. *initialize-eosio-genesis-node.yml*: Sets up a Leap node, syncing from the first block using a genesis.json file.
-2. *initialize-eosio-snapshot-node.yml*: Sets up a Leap node, using a provided snapshot file to start syncing at a later block.
+1. *initialize-leap-genesis-node.yml*: Sets up a Leap node, syncing from the first block using a genesis.json file.
+2. *initialize-leap-snapshot-node.yml*: Sets up a Leap node, using a provided snapshot file to start syncing at a later block.
 3. *initialize-hyperion-genesis-node.yml*: Sets up a Leap node configured for state history, with additional setup and configuration for Hyperion History API. 
-4. *update-eosio-node.yml*: Restarts a Leap node, applying nodeos version and/or configuration changes.
-5. *replay-eosio-node.yml*: Restarts and replays a Leap node, applying nodeos version and/or configuration changes.
-6. *initialize-system*: Only performs the initialize system step, without performing any eosio-specific functionality.
+4. *update-leap-node.yml*: Restarts a Leap node, applying nodeos version and/or configuration changes.
+5. *replay-leap-node.yml*: Restarts and replays a Leap node, applying nodeos version and/or configuration changes.
+6. *initialize-system*: Only performs the initialize system step, without performing any Leap-specific functionality.
 
 ### Roles
 
@@ -183,9 +183,9 @@ Select which chain this node will be configured for. Currently supported chains:
 
 - **eos**: the first and largest Leap network.
 - **wax**: a commercial Leap network focused on NFT adoption and gaming.
-- **fio**:  a customized eosio network focused on improving usability of cryptocurrencies.
+- **fio**:  a customized Leap network focused on improving usability of cryptocurrencies.
 - **telos**: a governed Leap network that is cheap to develop on.
-- **proton**: a custom eosio network for improving usability of banks.
+- **proton**: a custom Leap network for improving usability of banks.
 
 
 ###### Node Types
