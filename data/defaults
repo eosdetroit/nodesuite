@@ -105,7 +105,7 @@ wax:
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
     version: v3.1.2
-    chain_state_db_size_mb: 61440
+    chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
     prebuilt: yes
