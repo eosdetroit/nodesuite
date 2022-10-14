@@ -10,7 +10,7 @@ Nodesuite allows importing and managing a directory of private gitignored config
 * Set up follow on processes automatically for Hyperion, nginx, DSP, BP claims, Delphi Oracle, and more.
 * Manage sensitive keys and passwords using Ansible Vault in your own private generated repository.
 
-Tested on Ubuntu 18.04 LTS. Nodesuite is soft-launched and a continual work in progress. 
+Tested on Ubuntu 18.04 & 20.04(recommended). Nodesuite is soft-launched and a continual work in progress. 
 
 ## Table of Contents
 <!--ts-->
@@ -150,7 +150,7 @@ Commands:
   config-symlink     Create symlink to specified config folder.
   configure-logging  Set logging level for Nodesuite CLI.
   reset              Wipe existing configurations & links.
-  setup              Guided setup: Answer questions to generate...
+  setup              Guided setup: Answer questions to generate configuration YAML files.
   vault-decrypt      Use to decrypt sensitive data via ansible vault.
   vault-encrypt      Use to encrypt sensitive data via ansible vault.
 ```
