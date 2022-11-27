@@ -61,7 +61,7 @@ last_block_cpu_effort_percent:
 cpu_effort_percent:
 http_max_response_time_ms: 100
 bp_fio_address:
-dl_block_log:
+dl_block_log: no
 block_log_file:
 block_log_url:
 data_dir: deploy/data
