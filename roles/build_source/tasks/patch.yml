@@ -10,13 +10,13 @@
   git_config:
     name: user.email
     scope: global
-    value: eosio@eosdtroit.io
+    value: leap@detroitledger.tech
 
 - name: Set name git config
   git_config:
     name: user.name
     scope: global
-    value: eosio@eosdetroit.io
+    value: leap@detroitledger.tech
 
 - name: Create patches directory if it doesn't exist
   file:
