@@ -1,6 +1,5 @@
 upstream {{ service_name }} {
-    server {{ http_proxy_ip }}:{{ http_proxy_port }} fail_timeout=15s;
-    # ... more upstreams ...
+    server {{ ipfs_ip }}:{{ ipfs_port }} fail_timeout=15s;
 }
 
 limit_req_zone $binary_remote_addr zone=mylimit:10m rate=5r/s;

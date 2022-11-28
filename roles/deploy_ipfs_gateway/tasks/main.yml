@@ -1,11 +1,34 @@
 ---
-- name: Install IPFS
-  community.general.snap:
-    name:
-      - ipfs
+- name: Creates directory
+  file:
+    path: /opt/src
+    state: directory
+
+- name: Download 
+  ansible.builtin.get_url:
+    url: https://dist.ipfs.tech/kubo/v0.17.0/kubo_v0.17.0_linux-amd64.tar.gz
+    dest: /opt/src/kubo_v0.17.0_linux-amd64.tar.gz
+  become: yes
+  become_user: root
+
+- name: Extract 
+  ansible.builtin.unarchive:
+    src: /opt/src/kubo_v0.17.0_linux-amd64.tar.gz
+    dest: /opt
+    remote_src: yes
+
+- name: Install
+  command: 'sh /opt/kubo/install.sh'
+
+- name: Initialize IPFS
+  command: 'ipfs init'
+
+- name: Installing nodeos service config
+  template:
+    src: 'ipfs.service.j2'
+    dest: '/etc/systemd/system/ipfs.service'
   become: yes
   become_user: root
 
 - include: nginx.yml
   when: setup_nginx | bool
-  
