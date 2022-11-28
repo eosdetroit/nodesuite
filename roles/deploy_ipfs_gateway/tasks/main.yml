@@ -1,0 +1,11 @@
+---
+- name: Install IPFS
+  community.general.snap:
+    name:
+      - ipfs
+  become: yes
+  become_user: root
+
+- include: nginx.yml
+  when: setup_nginx | bool
+  

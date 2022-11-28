@@ -6,8 +6,8 @@
 
 - name: Setup nginx vhost conf
   template:
-    src: leap-vhost.conf.j2
-    dest: /etc/nginx/sites-enabled/leap-vhost.conf
+    src: ipfs-vhost.conf.j2
+    dest: /etc/nginx/sites-enabled/ipfs-vhost.conf
 
 - name: restart nginx
   service:
@@ -15,10 +15,6 @@
     state: restarted
     enabled: yes
 
-- name: Add apt repositories
-  apt_repository:
-    repo: ppa:certbot/certbot
-
 - name: Install certbot
   apt:
-    name: python-certbot-nginx
+    name: python3-certbot-nginx

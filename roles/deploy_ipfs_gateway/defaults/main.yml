@@ -1,0 +1,7 @@
+---
+service_name: ipfs_gateway
+node_type: ipfs
+setup_nginx: yes
+api_endpoint: ipfs.PLACEHOLDER.com
+http_proxy_ip: 127.0.0.1
+http_proxy_port: 8080
