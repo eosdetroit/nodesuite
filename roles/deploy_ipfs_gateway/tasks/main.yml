@@ -23,12 +23,18 @@
 - name: Initialize IPFS
   command: 'ipfs init'
 
-- name: Installing nodeos service config
+- name: Installing IPFS service config
   template:
     src: 'ipfs.service.j2'
     dest: '/etc/systemd/system/ipfs.service'
   become: yes
   become_user: root
+
+- name: Start IPFS
+  service:
+    name: ipfs
+    state: restarted
+    enabled: yes
 
 - include: nginx.yml
   when: setup_nginx | bool

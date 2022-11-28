@@ -44,17 +44,17 @@
     dest: '/etc/systemd/system/certbot-renewal.timer'
     mode: u+rwx
     force: yes
-    
+
 - name: Start certbot renewal timer
   shell: 'sudo systemctl start certbot-renewal.timer'
   args:
     executable: /bin/bash
- become: yes
- become_user: root
+  become: yes
+  become_user: root
 
 - name: Enable certbot renewal timer on boot
   shell: 'sudo systemctl enable certbot-renewal.timer'
   args:
     executable: /bin/bash
- become: yes
- become_user: root
+  become: yes
+  become_user: root
