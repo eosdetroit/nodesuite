@@ -120,9 +120,9 @@ wax:
     last_block_cpu_effort_percent: 25
 
 all:
-    working_dir: /opt/eosio
-    deploy_user: eosio
-    deploy_group: eosio
+    working_dir: /opt/leap
+    deploy_user: leap
+    deploy_group: leap
     agent_name: default
     producer_name: default
     provider_website: https://default.io
@@ -135,7 +135,7 @@ all:
     http_proxy_port: 8888
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8887
-    genesis_json_path: /opt/eosio/deploy/genesis.json
+    genesis_json_path: /opt/leap/deploy/genesis.json
     git_repo: https://github.com/AntelopeIO/leap.git
     peer_pubkey: ''
     peer_privkey: ''
@@ -149,7 +149,7 @@ all:
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
     version: v3.1.2
     package: leap-3.1.2-ubuntu20.04-x86_64.deb
-    build_script: eosio_build.sh
+    build_script: pinned_build.sh
     apply_patch: ''
     force_build: ''
     setup_hyperion: ''

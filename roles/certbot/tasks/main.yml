@@ -5,6 +5,12 @@
     state: latest
     update_cache: yes
 
+- name: Install certbot-nginx
+  apt: 
+    name: 'python3-certbot-nginx'
+    state: latest
+    update_cache: yes
+
 - name: Install pexpect
   pip:
     name: pexpect
@@ -19,6 +25,7 @@
       "Would you be willing to share your email address with the Electronic Frontier": "N"
       "Select the appropriate number": "{{ force_redirect }}"
   become: yes
+  become_user: root
   register: output
 
 - name: Certbot output
@@ -37,17 +44,17 @@
     dest: '/etc/systemd/system/certbot-renewal.timer'
     mode: u+rwx
     force: yes
-    
+
 - name: Start certbot renewal timer
   shell: 'sudo systemctl start certbot-renewal.timer'
   args:
     executable: /bin/bash
   become: yes
-  become_user: '{{ deploy_user }}'
+  become_user: root
 
 - name: Enable certbot renewal timer on boot
   shell: 'sudo systemctl enable certbot-renewal.timer'
   args:
     executable: /bin/bash
   become: yes
-  become_user: '{{ deploy_user }}'
+  become_user: root

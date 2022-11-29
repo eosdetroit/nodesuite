@@ -46,15 +46,15 @@ install_elastic() {
   sudo service elasticsearch start
   sudo systemctl enable elasticsearch
 
-  echo "y" | sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto | sudo tee /opt/eosio/src/Hyperion-History-API/elastic_pass.txt
-  sudo chmod 777 /opt/eosio/src/Hyperion-History-API/elastic_pass.txt
+  echo "y" | sudo /usr/share/elasticsearch/bin/elasticsearch-setup-passwords auto | sudo tee /opt/leap/src/Hyperion-History-API/elastic_pass.txt
+  sudo chmod 777 /opt/leap/src/Hyperion-History-API/elastic_pass.txt
 }
 
 install_kibana() {
   echo -e "\n\n\n\n"
   sudo apt install -y kibana
 
-  KIBANA_PASSWORD=$(awk </opt/eosio/src/Hyperion-History-API/elastic_pass.txt '/PASSWORD kibana =/ {print $4}')
+  KIBANA_PASSWORD=$(awk </opt/leap/src/Hyperion-History-API/elastic_pass.txt '/PASSWORD kibana =/ {print $4}')
   sudo sed -ie 's/#elasticsearch.password: "pass"/elasticsearch.password: '"$KIBANA_PASSWORD"'/; s/#elasticsearch.username: "kibana"/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 
   sudo systemctl enable kibana

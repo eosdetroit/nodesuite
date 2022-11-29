@@ -17,7 +17,7 @@
 
 - name: Clean old package version
   apt:
-    name: eosio
+    name: leap
     state: absent
   become: yes
   become_user: root
