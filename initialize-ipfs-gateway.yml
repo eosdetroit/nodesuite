@@ -9,6 +9,5 @@
   vars_files:
     - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
   roles:
-    - { role: initialize_system }
     - { role: deploy_ipfs_gateway }
     - { role: certbot }
