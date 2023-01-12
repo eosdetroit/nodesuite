@@ -147,14 +147,6 @@
     chdir: '{{ working_dir }}/src/Hyperion-History-API'
   register: elastic_pw
 
-- name: Configure Hyperion API
-  template:
-    src: ecosystem.config.js.j2
-    dest: "{{ working_dir }}/src/Hyperion-History-API/ecosystem.config.js"
-    mode: u+wrx
-    owner: "{{ deploy_user }}"
-    group: "{{ deploy_group }}"
-
 - name: Configure Hyperion connections.json
   template:
     src: connections.json.j2

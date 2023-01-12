@@ -1,4 +1,6 @@
 ---
+hyperion_version: v3.3.8
+api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
 redis_conf_path: /etc/redis/redis.conf
 hyp_chain_logo_url: https://bloks.io/img/chains
 hyp_api_threads: 1
@@ -22,9 +24,16 @@ hyp_fetch_traces: true
 hyp_disable_reading: false
 hyp_disable_indexing: false
 hyp_process_deltas: true
-hyp_max_inline: 20
-hyperion_version: v3.3.5
-api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
+hyp_disable_delta_rm: true
+hyp_ds_pool_size: 1
+hyp_dyn_idx_queues: 1
+hyp_max_autoscale: 4
+hyp_batch_size: 5000
+hyp_resume_trigger: 5000
+hyp_auto_scale_trigger: 20000
+hyp_block_queue_limit: 10000
+hyp_max_queue_limit: 100000
+hyp_polling_interval: 10000
 
 rabbitmq_vhost: hyperion
 rabbitmq_user: changemeplz
