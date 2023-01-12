@@ -1,8 +1,0 @@
-const {addApiServer, addIndexer} = require("./definitions/ecosystem_settings");
-
-module.exports = {
-    apps: [
-        addIndexer('{{ name }}'), // Index chain name
-        addApiServer('{{ name }}', {{ hyp_api_threads }}) // API chain name, API threads number
-    ]
-};
