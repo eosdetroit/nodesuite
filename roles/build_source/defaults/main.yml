@@ -9,4 +9,5 @@ cli_bin: cleos
 keosd_bin: keosd
 blocklog_bin: eosio-blocklog
 trace_api_bin: trace_api_util
+leap_util_bin: leap-util
 patches:

@@ -1,4 +1,8 @@
 ---
+- name: Print variable value
+  debug: 
+      "msg={{ package }}"
+
 - name: Copying {{ package }} to host
   copy:
     src: '{{ name }}/{{ package }}'
@@ -28,7 +32,7 @@
   become: yes
   become_user: root
 
-- name: Preparing to version programs
+- name: Preparing to version binaries
   file:
     path: '{{ working_dir }}/versions/{{ version }}/'
     state: directory
@@ -42,7 +46,7 @@
     - '{{ trace_api_bin }}'
 
 
-- name: Versioning programs
+- name: Versioning binaries
   copy:
     remote_src: yes
     src: '{{ pkg_install_path }}/{{ item }}'
@@ -58,3 +62,17 @@
     - '{{ keosd_bin }}'
     - '{{ blocklog_bin }}'
     - '{{ trace_api_bin }}'
+
+- name: Versioning utility tool binaries
+  copy:
+    remote_src: yes
+    src: '{{ pkg_install_path }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    mode: u+rwx
+  become: yes
+  become_user: root
+  loop:
+    - '{{ leap_util_bin }}'
+  ignore_errors: yes
