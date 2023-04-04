@@ -20,15 +20,11 @@ eos-vm-oc-enable = 1
 chain-state-db-size-mb = {{ chain_state_db_size_mb }}
 {% endif %}
 
-# Safely shut down node when free space remaining in the chain state database drops below this size (in MiB). (eosio::chain_plugin)
-# chain-state-db-guard-size-mb = 128
-
 # Number of worker threads in controller thread pool (eosio::chain_plugin)
 chain-threads = {{ chain_threads }}
 
 # print contract's output to console (eosio::chain_plugin)
 contracts-console = true
-
 
 # Database read mode ("speculative", "head", "read-only", "irreversible").
 # In "speculative" mode database contains changes done up to the head block plus changes made by transactions not yet included to the blockchain.
@@ -46,15 +42,6 @@ read-mode = head
 p2p-accept-transactions = false 
 {% endif %}
 
-# Chain validation mode ("full" or "light").
-# In "full" mode all incoming blocks will be fully validated.
-# In "light" mode all incoming blocks headers will be fully validated; transactions in those validated blocks will be trusted
-#  (eosio::chain_plugin)
-# validation-mode = full
-
-# Disable the check which subjectively fails a transaction if a contract bills more RAM to another account within the context of a notification handler (i.e. when the receiver is not the code of the action). (eosio::chain_plugin)
-# disable-ram-billing-notify-checks = false
-
 # Indicate a producer whose blocks headers signed by it will be fully validated, but transactions in those validated blocks will be trusted. (eosio::chain_plugin)
 # trusted-producer =
 {% if producer_name %}
@@ -67,12 +54,6 @@ trusted-producer = {{ producer_name }}
 # In "locked" mode database is preloaded, locked in to memory, and optionally can use huge pages.
 #  (eosio::chain_plugin)
 # database-map-mode = mapped
-
-# Track actions which match receiver:action:actor. Actor may be blank to include all. Action and Actor both blank allows all from Recieiver. Receiver may not be blank. (eosio::history_plugin)
-# filter-on =
-
-# Do not track actions which match receiver:action:actor. Action and Actor both blank excludes all from Reciever. Actor blank excludes all from reciever:action. Receiver may not be blank. (eosio::history_plugin)
-# filter-out =
 
 # true: validate that the peer certificates are valid and trusted, false: ignore cert errors (eosio::http_client_plugin)
 # https-client-validate-peers = true
@@ -177,15 +158,6 @@ producer-threads = {{ producer_threads }}
 
 # the location of the snapshots directory (absolute path or relative to application data dir) (eosio::producer_plugin)
 # snapshots-dir = "snapshots"
-
-# the location of the state-history directory (absolute path or relative to application data dir) (eosio::state_history_plugin)
-# state-history-dir = "state-history"
-
-# the endpoint upon which to listen for incoming connections. Caution: only expose this port to your internal network. (eosio::state_history_plugin)
-# state-history-endpoint = 127.0.0.1:8080
-
-# enable debug mode for trace history (eosio::state_history_plugin)
-# trace-history-debug-mode = false
 
 # Number of worker threads in txn_test_gen thread pool (eosio::txn_test_gen_plugin)
 txn-test-gen-threads = {{ txn_test_gen_threads }}
