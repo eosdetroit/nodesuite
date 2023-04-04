@@ -50,13 +50,6 @@ hyperion:
 seed:
     node_type: seed
 
-mongo:
-    setup_mongo: yes
-    mongo_git_repo: https://github.com/CryptoLions/EOS-mongo-history-API
-    mongo_api_version: master
-    http_proxy_port: 3333
-    service_name: mongoapi
-    mongo_flag: -m
 nginx:
     setup_nginx: yes
 
@@ -111,6 +104,7 @@ wax:
     prebuilt: yes
     apt_package: no
     bin_package: yes
+    bin_src: local
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
     package: wax-leap-3.2.2wax01-ubuntu-20.04-x86_64.deb
@@ -140,15 +134,14 @@ all:
     peer_pubkey: ''
     peer_privkey: ''
     peer_keys: ''
-    mongo_flag: ''
     setup_block_storage: ''
     wasm_runtime: eos-vm-jit
     prebuilt: yes
     bin_package: yes
-    bin_src: local
+    bin_src: remote
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
-    version: v3.1.2
-    package: leap-3.1.2-ubuntu20.04-x86_64.deb
+    version: v3.2.3
+    package: leap_3.2.3-ubuntu20.04_amd64.deb
     build_script: pinned_build.sh
     apply_patch: ''
     force_build: ''
@@ -160,4 +153,5 @@ all:
     keosd_bin: keosd
     blocklog_bin: eosio-blocklog
     trace_api_bin: trace_api_util
+    leap_util_bin: leap-util
     testnet_name: ''

@@ -12,7 +12,6 @@ use_genesis_json:
 enable_account_queries:
 setup_hyperion:
 setup_state_history:
-setup_mongo:
 setup_nginx:
 setup_producer:
 setup_dsp:

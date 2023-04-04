@@ -201,24 +201,3 @@ trace-history = true
 chain-state-history = true
 state-history-endpoint = {{ state_history_server_ip }}:{{ state_history_server_port }}
 plugin = eosio::state_history_plugin
-{% elif setup_mongo | d() | bool %}
-plugin = eosio::mongo_db_plugin
-mongodb-uri = mongodb://127.0.0.1:27017/{{ token_symbol }}
-mongodb-filter-on = *
-#mongodb-filter-out = spammer::
-mongodb-filter-out = eosio:onblock:
-mongodb-filter-out = gu2tembqgage::
-mongodb-filter-out = blocktwitter::
-mongodb-queue-size = 2048
-abi-serializer-max-time-ms = 5000
-mongodb-block-start = 1
-mongodb-store-block-states = false
-mongodb-store-blocks = false
-mongodb-store-transactions = false
-mongodb-store-transaction-traces = true
-mongodb-store-action-traces = true
-{% elif setup_v1_history | d() | bool %}
-plugin = eosio::history_plugin
-plugin = eosio::history_api_plugin
-filter-on = *
-{% endif %}
