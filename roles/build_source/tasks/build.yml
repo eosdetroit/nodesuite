@@ -34,7 +34,7 @@
   when: apply_patch | bool
 
 - name: Running build script
-  shell: src/leap/scripts/{{ build_script }}  -y -P -i vendor -s {{ token_symbol | quote }} {{ mongo_flag }} 
+  shell: src/leap/scripts/{{ build_script }}  -y -P -i vendor -s {{ token_symbol | quote }}
   become: yes
   args:
     executable: /bin/bash

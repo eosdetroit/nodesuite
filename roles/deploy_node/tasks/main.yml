@@ -89,11 +89,7 @@
     do_replay: no
     use_snapshot: no
     use_genesis_json: no
-    setup_mongo: no
 
-- include: bootstrap/mongo.yml
-  when: setup_mongo | bool
-    
 - include: bootstrap/claims.yml
   when: setup_claims | bool
 
