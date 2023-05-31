@@ -5,11 +5,20 @@
 
 - name: Copying {{ package }} to host
   copy:
-    src: '{{ name }}/{{ package }}'
-    dest: '{{ working_dir }}/dist/{{ package }}'
-    owner: '{{ deploy_user }}'
-    group: '{{ deploy_group }}'
-  when: bin_src == 'local'
+    src: "{{ name }}/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name not in ['eos', 'proton', 'telos', 'libre', 'ore']
+
+- name: Copying {{ package }} to host
+  copy:
+    src: "eos/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name in ['eos', 'proton', 'telos', 'libre', 'ore']
+
 
 - name: Download {{ package }} to host
   get_url:
@@ -60,7 +69,6 @@
     - '{{ nodeos_bin }}'
     - '{{ cli_bin }}'
     - '{{ keosd_bin }}'
-    - '{{ blocklog_bin }}'
     - '{{ trace_api_bin }}'
 
 - name: Versioning utility tool binaries
@@ -74,5 +82,6 @@
   become: yes
   become_user: root
   loop:
+    - '{{ blocklog_bin }}'
     - '{{ leap_util_bin }}'
   ignore_errors: yes
