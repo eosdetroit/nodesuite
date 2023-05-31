@@ -140,8 +140,8 @@ all:
     bin_package: yes
     bin_src: remote
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
-    version: v3.2.3
-    package: leap_3.2.3-ubuntu20.04_amd64.deb
+    version: v4.0.1
+    package: leap_4.0.1-ubuntu20.04_amd64.deb
     build_script: pinned_build.sh
     apply_patch: ''
     force_build: ''
