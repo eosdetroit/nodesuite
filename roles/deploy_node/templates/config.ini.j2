@@ -159,9 +159,6 @@ producer-threads = {{ producer_threads }}
 # the location of the snapshots directory (absolute path or relative to application data dir) (eosio::producer_plugin)
 # snapshots-dir = "snapshots"
 
-# Number of worker threads in txn_test_gen thread pool (eosio::txn_test_gen_plugin)
-txn-test-gen-threads = {{ txn_test_gen_threads }}
-
 # Plugin(s) to enable, may be specified multiple times
 # plugin =
 {% for plugin in plugins %}

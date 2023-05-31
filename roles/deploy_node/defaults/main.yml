@@ -25,7 +25,6 @@ chain_threads: 2
 http_threads: 2
 net_threads: 2
 producer_threads: 2
-txn_test_gen_threads: 2
 sync_fetch_span: 500
 max_transaction_time: 150000
 claims_hour: '*'
