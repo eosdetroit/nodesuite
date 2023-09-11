@@ -13,7 +13,7 @@ eos-vm-oc-enable = 1
 {% endif %}
 
 # Override default maximum ABI serialization time allowed in ms (eosio::chain_plugin)
-# abi-serializer-max-time-ms = 15000
+abi-serializer-max-time-ms = {{ abi_serializer_max_time_ms }}
 
 # Maximum size (in MiB) of the chain state database (eosio::chain_plugin)
 {% if chain_state_db_size_mb %}

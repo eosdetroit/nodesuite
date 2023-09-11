@@ -66,3 +66,4 @@ data_dir: deploy/data
 update_configs_only: no
 node_type: 
 is_failover: no
+abi_serializer_max_time_ms: 20000

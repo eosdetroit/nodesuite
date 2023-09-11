@@ -97,17 +97,18 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v3.2.2wax01
+    version: 4.0.4wax01
+    pkg_install_path: /usr/local/bin
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
     prebuilt: yes
     apt_package: no
     bin_package: yes
-    bin_src: local
+    bin_src: remote
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
-    package: wax-leap-3.2.2wax01-ubuntu-20.04-x86_64.deb
+    package: wax-leap_4.0.4wax01-ubuntu20.04_amd64.deb
     wasm_runtime: eos-vm-jit
     last_block_time_offset_us: -300000
     cpu_effort_percent: 40
@@ -140,8 +141,8 @@ all:
     bin_package: yes
     bin_src: remote
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
-    version: v4.0.1
-    package: leap_4.0.1-ubuntu20.04_amd64.deb
+    version: v4.0.4
+    package: leap_4.0.4-ubuntu20.04_amd64.deb
     build_script: pinned_build.sh
     apply_patch: ''
     force_build: ''
@@ -155,3 +156,4 @@ all:
     trace_api_bin: trace_api_util
     leap_util_bin: leap-util
     testnet_name: ''
+    abi_serializer_max_time_ms: 20000
