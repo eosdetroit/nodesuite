@@ -27,6 +27,7 @@ net_threads: 2
 producer_threads: 2
 sync_fetch_span: 500
 max_transaction_time: 499
+read_only_read_window_time_us: 510001
 claims_hour: '*'
 claims_minute: '*'
 claims_api_url: http://127.0.0.1
@@ -67,3 +68,4 @@ update_configs_only: no
 node_type: 
 is_failover: no
 abi_serializer_max_time_ms: 20000
+database_map_mode: mapped

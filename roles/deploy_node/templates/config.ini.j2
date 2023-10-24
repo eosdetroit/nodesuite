@@ -1,9 +1,3 @@
-# the location of the blocks directory (absolute path or relative to application data dir) (eosio::chain_plugin)
-# blocks-dir = "blocks"
-
-# the location of the protocol_features directory (absolute path or relative to application config dir) (eosio::chain_plugin)
-# protocol-features-dir = "protocol_features"
-
 # Override default WASM runtime (eosio::chain_plugin)
 wasm-runtime = {{ wasm_runtime }}
 
@@ -53,7 +47,7 @@ trusted-producer = {{ producer_name }}
 # In "heap" mode database is preloaded in to swappable memory.
 # In "locked" mode database is preloaded, locked in to memory, and optionally can use huge pages.
 #  (eosio::chain_plugin)
-# database-map-mode = mapped
+database-map-mode = {{ database_map_mode }}
 
 # true: validate that the peer certificates are valid and trusted, false: ignore cert errors (eosio::http_client_plugin)
 # https-client-validate-peers = true
@@ -77,9 +71,6 @@ verbose-http-errors = true
 # If set to false, then any incoming "Host" header is considered valid (eosio::http_plugin)
 http-validate-host = false
 
-# Additionaly acceptable values for the "Host" header of incoming HTTP requests, can be specified multiple times.  Includes http/s_server_address by default. (eosio::http_plugin)
-# http-alias =
-
 # Number of worker threads in http thread pool (eosio::http_plugin)
 http-threads = {{ http_threads }}
 
@@ -95,16 +86,10 @@ p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
 p2p-peer-address = {{ peer }}
 {% endfor %}
 
-# Maximum number of client nodes from any single IP address (eosio::net_plugin)
-# p2p-max-nodes-per-host = 1
-
 # The name supplied to identify this node amongst the peers. (eosio::net_plugin)
 {% if agent_name  %}
 agent-name = "{{ agent_name }}"
 {% endif %}
-
-# Can be 'any' or 'producers' or 'specified' or 'none'. If 'specified', peer-key must be specified at least once. If only 'producers', peer-key is not required. 'producers' and 'specified' may be combined. (eosio::net_plugin)
-# allowed-connection = any
 
 # Optional public key of peer allowed to connect.  May be used multiple times. (eosio::net_plugin)
 # peer-key =
@@ -114,9 +99,8 @@ agent-name = "{{ agent_name }}"
 	{% endfor %}
 {% endif %}
 
-
-# Tuple of [PublicKey, WIF private key] (may specify multiple times) (eosio::net_plugin)
 {% if peer_pubkey and peer_privkey %}
+# Tuple of [PublicKey, WIF private key] (may specify multiple times) (eosio::net_plugin)
 peer-private-key = ["{{ peer_pubkey }}", "{{ peer_privkey }}"]
 {% endif %}
 
@@ -132,14 +116,17 @@ sync-fetch-span = {{ sync_fetch_span }}
 # Limits the maximum time (in milliseconds) that is allowed a pushed transaction's code to execute before being considered invalid (eosio::producer_plugin)
 max-transaction-time = {{ max_transaction_time }}
 
+# Maximum time the node will run parallel read-only operations (eosio::producer_plugin)
+read-only-read-window-time-us = {{ read_only_read_window_time_us }}
+
 {% if setup_producer | bool %}
 plugin = eosio::producer_plugin
 producer-name = {{ producer_name }}
-	{% if is_failover | bool %}
-	signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_signing_key }}
-	{% else %}
-	signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
-	{% endif %}
+{% if is_failover | bool %}
+signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_signing_key }}
+{% else %}
+signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
+{% endif %}
 {% if last_block_time_offset_us | d() | bool %}
 last-block-time-offset-us = {{ last_block_time_offset_us }}
 {% endif %}
@@ -155,9 +142,6 @@ last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
 
 # Number of worker threads in producer thread pool (eosio::producer_plugin)
 producer-threads = {{ producer_threads }}
-
-# the location of the snapshots directory (absolute path or relative to application data dir) (eosio::producer_plugin)
-# snapshots-dir = "snapshots"
 
 # Plugin(s) to enable, may be specified multiple times
 # plugin =
