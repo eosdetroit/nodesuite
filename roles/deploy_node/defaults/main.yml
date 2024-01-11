@@ -27,7 +27,7 @@ net_threads: 2
 producer_threads: 2
 sync_fetch_span: 500
 max_transaction_time: 499
-read_only_read_window_time_us: 510001
+read_only_read_window_time_us: 165000
 claims_hour: '*'
 claims_minute: '*'
 claims_api_url: http://127.0.0.1
@@ -55,9 +55,6 @@ hyperion_deserializers: 1
 hyp_deserializer_threads: 1
 hyp_es_idx_queues: 1
 hyp_es_ad_idx_queues: 1
-last_block_time_offset_us:
-last_block_cpu_effort_percent:
-cpu_effort_percent:
 http_max_response_time_ms: 100
 bp_fio_address:
 dl_block_log: no

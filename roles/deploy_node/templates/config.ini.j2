@@ -127,16 +127,12 @@ signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_s
 {% else %}
 signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
 {% endif %}
-{% if last_block_time_offset_us | d() | bool %}
-last-block-time-offset-us = {{ last_block_time_offset_us }}
-{% endif %}
 
-{% if cpu_effort_percent | d() | bool %}
-cpu-effort-percent = {{ cpu_effort_percent }}
+{% if disable_subjective_api_billing | default(false) | bool %}
+	disable-subjective-api-billing = {{ disable_subjective_api_billing }}
 {% endif %}
-
-{% if last_block_cpu_effort_percent | d() | bool %}
-last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
+{% if disable_subjective_p2p_billing | default(false) | bool %}
+	disable-subjective-p2p-billing = {{ disable_subjective_p2p_billing }}
 {% endif %}
 {% endif %}
 
