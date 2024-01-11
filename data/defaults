@@ -16,14 +16,13 @@ producer:
     setup_producer: yes
     setup_claims: yes
     claims_wallet_name: claims
-    cpu_effort_percent: 40
-    last_block_cpu_effort_percent: 25
 
 state_history:
     setup_state_history: yes
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8080
     eos_vm_oc_enable: yes
+    disable_subjective_api_billing: false
 
 v1_history:
     setup_v1_history: yes
@@ -49,7 +48,9 @@ hyperion:
 
 seed:
     node_type: seed
-
+    disable_subjective_p2p_billing: false
+chain_api:
+    disable_subjective_api_billing: false
 nginx:
     setup_nginx: yes
 
@@ -75,8 +76,6 @@ fio:
     max_clients: 100
     claim_account: fio.treasury
     claim_action: bpclaim
-    cpu_effort_percent: ''
-    last_block_cpu_effort_percent: ''
     wasm_runtime: wabt
     apply_patch: no
 
@@ -97,8 +96,8 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: 4.0.4wax01
-    pkg_install_path: /usr/local/bin
+    version: 5.0.0wax01
+    pkg_install_path: /usr/bin
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
@@ -108,11 +107,8 @@ wax:
     bin_src: remote
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
-    package: wax-leap_4.0.4wax01-ubuntu20.04_amd64.deb
+    package: wax-leap_5.0.0wax01_amd64.deb
     wasm_runtime: eos-vm-jit
-    last_block_time_offset_us: -300000
-    cpu_effort_percent: 40
-    last_block_cpu_effort_percent: 25
 
 all:
     working_dir: /opt/leap
@@ -141,8 +137,8 @@ all:
     bin_package: yes
     bin_src: remote
     bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
-    version: v4.0.4
-    package: leap_4.0.4-ubuntu20.04_amd64.deb
+    version: v5.0.0
+    package: leap_5.0.0_amd64.deb
     build_script: pinned_build.sh
     apply_patch: ''
     force_build: ''
@@ -157,3 +153,5 @@ all:
     leap_util_bin: leap-util
     testnet_name: ''
     abi_serializer_max_time_ms: 20000
+    disable_subjective_api_billing: true
+    disable_subjective_p2p_billing: true
