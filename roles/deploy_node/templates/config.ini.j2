@@ -128,11 +128,11 @@ signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_s
 signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
 {% endif %}
 
-{% if disable_subjective_api_billing | default(false) | bool %}
-	disable-subjective-api-billing = {{ disable_subjective_api_billing }}
+{% if not disable_subjective_api_billing | default(false) | bool %}
+disable-subjective-api-billing = {{ disable_subjective_api_billing }}
 {% endif %}
-{% if disable_subjective_p2p_billing | default(false) | bool %}
-	disable-subjective-p2p-billing = {{ disable_subjective_p2p_billing }}
+{% if not disable_subjective_p2p_billing | default(false) | bool %}
+disable-subjective-p2p-billing = {{ disable_subjective_p2p_billing }}
 {% endif %}
 {% endif %}
 
