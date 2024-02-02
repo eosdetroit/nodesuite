@@ -19,7 +19,6 @@ p2p-accept-transactions = false
 {% if http_max_response_time_ms | d() %}
 http-max-response-time-ms = {{ http_max_response_time_ms }}
 {% endif %}
-reversible-blocks-db-size-mb = {{ reversible_blocks_db_size_mb }}
 chain-threads = {{ chain_threads }}
 contracts-console = true
 http-server-address = {{ http_server_ip }}:{{ http_server_port }}
@@ -32,20 +31,11 @@ p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
 {% if producer_name %}
 trusted-producer = {{ producer_name }}
 {% endif %}
-{% if cpu_effort_percent %}
-cpu-effort-percent = {{ cpu_effort_percent }}
-{% endif %}
 {% if last_block_time_offset_us %}
 last-block-time-offset-us = {{ last_block_time_offset_us }}
 {% endif %}
-{% if last_block_cpu_effort_percent %}
-last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
-{% endif %}
 {% if producer_threads %}
 producer-threads = {{ producer_threads }}
-{% endif %}
-{% if txn_test_gen_threads %}
-txn-test-gen-threads = {{ txn_test_gen_threads }}
 {% endif %}
 {% for plugin in plugins %}
 plugin = {{ plugin }}
@@ -68,4 +58,17 @@ state-history-endpoint = 127.0.0.1:8887
 plugin = eosio::history_plugin
 plugin = eosio::history_api_plugin
 plugin = eosio::state_history_plugin
+{% endif %}
+
+{% if 'leap' not in package %}
+{% if last_block_cpu_effort_percent %}
+last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
+{% endif %}
+{% if cpu_effort_percent %}
+cpu-effort-percent = {{ cpu_effort_percent }}
+{% endif %}
+reversible-blocks-db-size-mb = {{ reversible_blocks_db_size_mb }}
+{% if txn_test_gen_threads %}
+txn-test-gen-threads = {{ txn_test_gen_threads }}
+{% endif %}
 {% endif %}

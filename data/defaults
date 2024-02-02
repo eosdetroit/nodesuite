@@ -88,6 +88,56 @@ fio:
     wasm_runtime: wabt
     apply_patch: no
 
+libre:
+    name: libre
+    token_symbol: LIBRE 
+    wasm_runtime: eos-vm-jit
+    git_repo: https://github.com/AntelopeIO/leap.git
+    version: v5.0.0
+    prebuilt: yes
+    package: leap_5.0.0_amd64.deb
+    bin_package: yes
+    bin_src: remote
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    working_dir: /opt/libre
+    deploy_user: libre
+    deploy_group: libre
+    agent_name: libre
+    producer_name: quantum
+    provider_website: https://www.quantumblok.com/libre
+    pid_file: nodeos.pid
+    p2p_server_ip: 0.0.0.0
+    p2p_server_port: 9876
+    http_server_ip: 0.0.0.0
+    http_server_port: 8888
+    http_proxy_ip: 127.0.0.1
+    http_proxy_port: 8888
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8887
+    genesis_json_path: /opt/libre/deploy/genesis.json
+    snapshot_base_url: https://snapshots.eosusa.io/snapshots/libre/latest.tar.gz
+    snapshot_file: latest-snapshot.bin
+    snapshot_tar: latest-snapshot.bin.tar.gz
+    snapshot_dir: /opt/libre/snapshots
+    snapshot_provider: eosusa
+    setup_claims: no
+    use_snapshot: yes
+    plugins:
+      - eosio::chain_plugin
+      - eosio::chain_api_plugin
+      - eosio::http_plugin
+      - eosio::net_plugin
+    chain_state_db_size_mb: 32096
+    service_name: nodeos
+    eos_vm_oc_enable: yes
+    max_clients: 100
+    chain_threads: 2
+    producer_threads: 4
+    sync_fetch_span: 500
+    max_transaction_time: 150000
+    reversible_blocks_db_size_mb: 2048
+    data_dir: deploy/data
+
 proton:
     name: proton
     token_symbol: SYS

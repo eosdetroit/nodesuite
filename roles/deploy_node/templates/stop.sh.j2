@@ -1,13 +1,14 @@
 #!/bin/bash
 ################################################################################
 #
-# Scrip Created by http://CryptoLions.io
+# Script Created by @bensig
+# Modified from scripts by http://CryptoLions.io
 # For EOS mainnet
-#
 # https://github.com/CryptoLions/EOS-MainNet
 #
 ###############################################################################
-DATADIR=/opt/eosio/deploy/data 
+MAINDIR={{ working_dir }}/deploy/
+DATADIR=$MAINDIR/data
 
     if [ -f $DATADIR"/nodeos.pid" ]; then
         pid=$(cat $DATADIR"/nodeos.pid")
@@ -24,5 +25,3 @@ DATADIR=/opt/eosio/deploy/data
         done
         echo -ne "\rNodeos stopped. \n"
     fi
-    
-killall nodeos

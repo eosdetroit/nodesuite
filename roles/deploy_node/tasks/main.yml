@@ -28,7 +28,17 @@
     state: link
     force: yes
   when: not update_configs_only | bool
-  
+
+- name: Check if peers file exists
+  stat:
+    path: "data/peers/{{ name }}/{{ stage }}/current.peers"
+  register: peers_file
+
+- name: Read peers file
+  set_fact:
+    peers: "{{ lookup('file', 'data/peers/{{ name }}/{{ stage }}/current.peers').splitlines() }}"
+  when: peers_file.stat.exists
+
 - name: Creating config.ini file
   template:
     src: 'config.ini.j2'
@@ -78,10 +88,10 @@
     mode: u+rwx
     force: yes
 
-- name: Installing nodeos v2start script
+- name: Installing snapstart nodeos script
   template:
-    src: 'v2start.sh.j2'
-    dest: '{{ working_dir }}/deploy/v2start.sh'
+    src: 'snapstart.sh.j2'
+    dest: '{{ working_dir }}/deploy/snapstart.sh'
     mode: u+rwx
     force: yes
   when: use_snapshot | bool

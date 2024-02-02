@@ -6,7 +6,8 @@
 # https://github.com/CryptoLions/EOS-MainNet
 #
 ###############################################################################
-DATADIR=/opt/eosio/deploy/data 
+MAINDIR={{ working_dir }}/deploy/
+DATADIR=$MAINDIR/data
 
     if [ -f $DATADIR"/nodeos.pid" ]; then
         pid=$(cat $DATADIR"/nodeos.pid")
@@ -25,4 +26,4 @@ DATADIR=/opt/eosio/deploy/data
 
     fi
 
-/opt/eosio/deploy/nodeos --config-dir /opt/eosio/deploy/ --data-dir /opt/eosio/deploy/data/ 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
+$MAINDIR/nodeos --data-dir $DATADIR --config-dir $MAINDIR 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid

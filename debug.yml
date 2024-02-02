@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+  - name: Debug name variable
+    debug:
+      var: name
+  - name: Debug stage variable
+    debug:
+      var: stage

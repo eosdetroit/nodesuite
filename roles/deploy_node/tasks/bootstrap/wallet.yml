@@ -14,6 +14,7 @@
     src: 'setup_wallet.sh.j2'
     dest: '{{ working_dir }}/dist/setup_wallet.sh'
     mode: u+rwx
+    when: setup_wallet == True
 
 - name: Execute setup_wallet.sh
   shell: "{{ working_dir }}/dist/setup_wallet.sh"

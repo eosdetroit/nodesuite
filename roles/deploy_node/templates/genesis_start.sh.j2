@@ -6,7 +6,11 @@
 {% set genesis_json_flag = '--genesis-json' if (use_genesis_json | d() | bool) else empty_flag %}
 {% set genesis_json = genesis_json_path if (use_genesis_json | d() | bool) else empty_flag %}
 
-MAINDIR=`pwd`
+MAINDIR={{ working_dir }}/deploy/
 DATADIR=$MAINDIR/data
-mkdir -p "$DATADIR"
+
+if [ ! -d $DATADIR ]; then
+  mkdir -p $DATADIR;
+fi
+
 $MAINDIR/nodeos --config-dir $MAINDIR --data-dir $DATADIR {{ genesis_json_flag }} {{ genesis_json }} $@ 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid
