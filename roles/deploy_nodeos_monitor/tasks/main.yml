@@ -1,0 +1,42 @@
+---
+- name: Install python dependencies
+  pip:
+    name: 
+    - pushover
+    - slack-sdk
+
+- name: Stop monitoring service
+  systemd:
+    name: systemd_nodeos_monitor.service
+    state: stopped
+  ignore_errors: yes
+
+- name: Create monitoring directory
+  file:
+    path: /opt/monitoring
+    state: directory
+    mode: '0755'
+
+- name: Template systemd service file
+  template:
+    src: systemd_nodeos_monitor.service.j2
+    dest: /etc/systemd/system/systemd_nodeos_monitor.service
+
+- name: Template monitoring script
+  template:
+    src: systemd_nodeos_monitor.py.j2
+    dest: /opt/monitoring/systemd_nodeos_monitor.py
+
+- name: Template pushover secrets
+  template:
+    src: pushover.j2
+    dest: /opt/monitoring/.pushover
+
+- name: Reload daemon
+  command: systemctl daemon-reload
+  become: yes
+
+- name: Start monitoring service
+  systemd:
+    name: systemd_nodeos_monitor.service
+    state: started
