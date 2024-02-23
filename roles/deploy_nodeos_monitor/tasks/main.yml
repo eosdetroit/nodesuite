@@ -36,7 +36,7 @@
   become: yes
 
 - name: Enable nodeos monitor on startup
-  command: systemctl enable systemd_nodeos_monitor.py
+  command: systemctl enable systemd_nodeos_monitor.service
   become: yes
 
 - name: Start monitoring service
