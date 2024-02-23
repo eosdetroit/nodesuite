@@ -1,0 +1,127 @@
+import select
+from time import sleep
+from systemd import journal
+import socket
+import atexit
+import pushover
+
+client = pushover.PushoverClient("/opt/monitoring/.pushover") 
+hostname = socket.gethostname()
+
+def send_notification(message:str, message_title:str, message_priority:int, message_expire:int, message_retry:int):
+    client.send_message(message=message, title=message_title, priority=message_priority, expire=message_expire, retry=message_retry)
+
+atexit.register(
+    send_notification,
+    message='Stopped Nodeos Monitor.',
+    message_title=f'[{hostname}] Nodeos Monitor',
+    message_priority=0,
+    message_expire=3200,
+    message_retry=0,
+)
+
+alert_keywords = [
+    'plugin_startup',
+    'plugin_shutdown',
+    'exit',
+    'error',
+    'unlinked',
+    'invalid',
+    'incoming message length unexpected',
+    'Space usage warning',
+    'Snapshot can only be used to initialize an empty database'
+]
+
+fatal_keywords = [
+    'many open files',
+    'increase chain-state',
+    'handle_db_exhaustion',
+    'killed',
+    'dirty',
+    'complete',
+    'corrupt',
+    'state_history_write_exception',
+    'missed a block in trace_history.log',
+    'rethrow',
+    'exceeded file system configured threshold'
+]
+
+whitelist_keywords = [
+    'Host not found',
+    'Closing connection',
+    'canceled',
+    'refused',
+    'reset',
+    '0.0.0.0'
+]
+
+j = journal.Reader()
+j.log_level(journal.LOG_INFO)
+
+j.this_boot()
+j.this_machine()
+
+j.add_match(
+    _SYSTEMD_UNIT=u'nodeos.service',
+)
+
+j.seek_tail()
+j.get_previous()
+
+p = select.poll()
+
+journal_fd = j.fileno()
+poll_event_mask = j.get_events()
+p.register(journal_fd, poll_event_mask)
+
+def main():
+    try:
+        send_notification(
+            f'Starting...',
+            f'[{hostname}] Nodeos Monitor',
+            -1,
+            3600,
+            0,
+        )
+        while True:
+            if p.poll(250):
+                if j.process() == journal.APPEND:
+                    for entry in j:
+                        if any(word in entry['MESSAGE'] for word in fatal_keywords):
+                            send_notification(
+                                f'{entry["MESSAGE"]}',
+                                f'[{hostname}] FATAL - Nodeos Monitor',
+                                2,
+                                17200,
+                                300,
+                            )
+                            sleep(300)
+                            j.seek_tail()
+                            j.get_previous()
+
+                        if any(word in entry['MESSAGE'] for word in alert_keywords):
+                            if any(word in entry['MESSAGE'] for word in whitelist_keywords):
+                                continue
+                            send_notification(
+                                f'{entry["MESSAGE"]}',
+                                f'[{hostname}] INFO - Nodeos Monitor',
+                                0,
+                                3600,
+                                300,
+                            )
+                            sleep(10)
+                            j.seek_tail()
+                            j.get_previous()
+
+    except Exception as ex:
+        send_notification(
+            f'{ex}',
+            f'[{hostname}] Nodeos Monitor Exception: {type(ex).__name__}',
+            0,
+            7200,
+            1200,
+        )
+        sleep(600)
+
+if __name__ == "__main__":
+    main()
