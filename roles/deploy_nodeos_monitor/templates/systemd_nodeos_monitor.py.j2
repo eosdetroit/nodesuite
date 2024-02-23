@@ -28,8 +28,7 @@ alert_keywords = [
     'unlinked',
     'invalid',
     'incoming message length unexpected',
-    'Space usage warning',
-    'Snapshot can only be used to initialize an empty database'
+    'Space usage warning'
 ]
 
 fatal_keywords = [
@@ -75,6 +74,7 @@ poll_event_mask = j.get_events()
 p.register(journal_fd, poll_event_mask)
 
 def main():
+    sleep(5)
     try:
         send_notification(
             f'Starting...',

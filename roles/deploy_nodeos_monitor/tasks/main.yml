@@ -3,7 +3,6 @@
   pip:
     name: 
     - pushover
-    - slack-sdk
 
 - name: Stop monitoring service
   systemd:
@@ -34,6 +33,10 @@
 
 - name: Reload daemon
   command: systemctl daemon-reload
+  become: yes
+
+- name: Enable nodeos monitor on startup
+  command: systemctl enable systemd_nodeos_monitor.py
   become: yes
 
 - name: Start monitoring service
