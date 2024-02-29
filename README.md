@@ -9,8 +9,9 @@ Nodesuite allows importing and managing a directory of private gitignored config
 * Sync from genesis or using a snapshot. Some support for block log download.
 * Set up follow on processes automatically for Hyperion, nginx, DSP, BP claims, Delphi Oracle, and more.
 * Manage sensitive keys and passwords using Ansible Vault in your own private generated repository.
+* Setup monitoring & alerting for Nodeos(Leap) to your Slack and/or Pushover.
 
-Tested on Ubuntu 18.04 & 20.04(recommended). Nodesuite is soft-launched and a continual work in progress. 
+Tested on Ubuntu 20.04 & 22.04(recommended). Nodesuite is a continual work in progress. 
 
 ## Table of Contents
 <!--ts-->
@@ -88,6 +89,7 @@ The following playbooks are provided to manage various aspects of the node lifec
 4. *update-leap-node.yml*: Restarts a Leap node, applying nodeos version and/or configuration changes.
 5. *replay-leap-node.yml*: Restarts and replays a Leap node, applying nodeos version and/or configuration changes.
 6. *initialize-system*: Only performs the initialize system step, without performing any Leap-specific functionality.
+7. *initialize-nodeos-monitor*: Setup nodeos monitoring & alerting solution via Slack webhook and/or Pushover.
 
 ### Roles
 
