@@ -113,8 +113,3 @@
   when: 
   - setup_oracle | bool
   - not update_configs_only | bool
-
-- include: bootstrap/oig.yml
-  when: 
-  - setup_oracle | bool
-  - not update_configs_only | bool
