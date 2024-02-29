@@ -3,6 +3,7 @@
   pip:
     name: 
     - pushover
+    - slack-sdk
 
 - name: Stop monitoring service
   systemd:
