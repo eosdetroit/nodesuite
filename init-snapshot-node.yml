@@ -1,0 +1,45 @@
+- hosts: '{{ target }}'
+  gather_facts: yes
+  become: yes
+  become_user: root
+  strategy: free
+  pre_tasks:
+    - name: Include host-specific variables
+      include_vars:
+        file: "host_vars/{{ inventory_hostname }}.yml"
+
+    - name: Check deploy_user after including host-specific variables
+      debug:
+        var: deploy_user
+
+    - name: Include stage-specific variables
+      include_vars:
+        file: "stage_vars/{{ name }}/{{ stage }}/vars.yml"
+
+    - name: Include stage-specific vault variables
+      include_vars:
+        file: "stage_vars/{{ name }}/{{ stage }}/vault.yml"
+
+    - name: Check deploy_user before initialize_system role
+      debug:
+        var: deploy_user
+
+    - raw: sudo apt-get update && sudo apt-get -y install python jq zstd git
+
+  roles:
+    - role: initialize_system
+
+  tasks:
+    - name: Check deploy_user after initialize_system role
+      debug:
+        var: deploy_user
+
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: '{{ deploy_user }}'
+  vars:
+    use_snapshot: yes
+  roles:
+    - { role: build_source }
+    - { role: deploy_node }

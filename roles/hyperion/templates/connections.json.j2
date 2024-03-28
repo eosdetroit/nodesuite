@@ -12,8 +12,8 @@
     "protocol": "http",
     "host": "127.0.0.1:{{ hyp_es_port }}",
     "ingest_nodes": ["127.0.0.1:{{ hyp_es_port }}"],
-    "user": "elastic",
-    "pass": "{{ elastic_pw.stdout }}"
+    "user": "{{ hyp_es_api_basic_auth_username }}",
+    "pass": "{{ hyp_es_api_basic_auth_password }}"
   },
   "redis": {
     "host": "127.0.0.1",

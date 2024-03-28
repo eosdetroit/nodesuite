@@ -1,0 +1,63 @@
+################################################################################
+# Phoenix tools
+# This is a State History config.ini - for server role specific examples
+# This is for providing services like Hyperion  
+#################################################################################
+
+### Local Options
+p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
+p2p-server-address = {{ p2p_server_ip }}:{{ p2p_server_port }}  # set server address
+
+### Chain API Plugin
+plugin = eosio::chain_api_plugin
+http-server-address = 0.0.0.0:8888
+http-validate-host = false
+http-threads = 6
+access-control-allow-origin = *
+access-control-allow-headers = Origin, X-Requested-With, Content-Type, Accept
+http-max-response-time-ms = 100
+enable-account-queries = true
+verbose-http-errors = true
+
+### Chain Plugin
+plugin = eosio::chain_plugin
+wasm-runtime = eos-vm-jit
+eos-vm-oc-enable = 1
+eos-vm-oc-compile-threads = 4
+contracts-console = false
+abi-serializer-max-time-ms = 2000
+chain-state-db-size-mb = 16384
+chain-state-db-guard-size-mb = 128
+reversible-blocks-db-size-mb = 1024
+reversible-blocks-db-guard-size-mb = 2
+chain-threads = 8
+sync-fetch-span = 2000
+allowed-connection = any
+
+### Net Plugin
+plugin = eosio::net_plugin
+net-threads = 8
+max-clients = 150
+p2p-max-nodes-per-host = 5
+max-clients = 150
+connection-cleanup-period = 30
+
+### eosio2.0
+eos-vm-oc-compile-threads = 4
+eos-vm-oc-enable = 1
+wasm-runtime = eos-vm-jit
+
+###########################################################################
+### State History (Hyperion)
+### State History (For 1.8.0-rc1+ add to start params --disable-replay-opts )
+plugin = eosio::state_history_plugin
+state-history-dir = state-history
+trace-history = true
+chain-state-history = true
+disable-replay-opts = true
+state-history-endpoint = 0.0.0.0:8887
+############################################################################
+
+{% for peer in peers %}
+p2p-peer-address = {{ peer }}
+{% endfor %}

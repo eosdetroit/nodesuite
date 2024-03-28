@@ -18,7 +18,7 @@ setup_dsp:
 setup_claims:
 setup_v1_history:
 service_name: nodeos
-wasm_runtime: wabt
+wasm_runtime: eos-vm-jit
 eos_vm_oc_enable:
 max_clients: 100
 chain_threads: 2
@@ -64,5 +64,6 @@ data_dir: deploy/data
 update_configs_only: no
 node_type: 
 is_failover: no
+pause_on_startup: false
 abi_serializer_max_time_ms: 20000
 database_map_mode: mapped
