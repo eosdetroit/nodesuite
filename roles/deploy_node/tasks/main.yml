@@ -15,7 +15,7 @@
 
 - name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
   file:
-    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}/{{ nodeos_bin }}'
+    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}'
     path: '{{ working_dir }}/deploy/nodeos'
     state: link
     force: yes
@@ -23,7 +23,7 @@
 
 - name: Linking {{ cli_bin }} {{ version }} into dist directory
   file:
-    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}/{{ cli_bin }}'
+    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}'
     path: '{{ working_dir }}/dist/{{ cli_bin }}'
     state: link
     force: yes
@@ -168,26 +168,27 @@
     do_replay: no
     use_snapshot: no
     use_genesis_json: no
-    setup_mongo: no
 
-- include: bootstrap/mongo.yml
-  when: setup_mongo | bool
-    
 - include: bootstrap/claims.yml
-  when: setup_claims | bool
+  when: 
+  - setup_claims | bool
+  - not update_configs_only | bool
 
 - include: bootstrap/nginx.yml
-  when: setup_nginx | bool
+  when: 
+  - setup_nginx | bool
+  - not update_configs_only | bool
   become: yes
   become_user: root
 
 - include: bootstrap/dsp.yml
-  when: setup_dsp | bool
+  when: 
+  - setup_dsp | bool
+  - not update_configs_only | bool
   become: yes
   become_user: root
 
 - include: bootstrap/oracle.yml
-  when: setup_oracle | bool
-
-- include: bootstrap/oig.yml
-  when: setup_oig | bool
+  when: 
+  - setup_oracle | bool
+  - not update_configs_only | bool

@@ -5,6 +5,8 @@ After=network.target
 [Service]
 User={{ deploy_user }}
 Restart=always
+RestartSec=1
+TimeoutSec=0
 Type=forking
 PIDfile={{ working_dir}}/deploy/data/nodeos.pid
 WorkingDirectory={{ working_dir}}/deploy

@@ -1,6 +1,6 @@
 ---
-rabbitmq_user: admin
-rabbitmq_vhost: /hyperion
+hyperion_version: v3.3.8
+api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
 redis_conf_path: /etc/redis/redis.conf
 hyp_chain_logo_url: https://bloks.io/img/chains
 hyp_api_threads: 1
@@ -16,7 +16,7 @@ hyp_start_block: 0
 hyp_stop_block: 0
 hyp_abi_scan_mode: true
 hyp_rewrite_mode: false
-hyp_purge_queues: true
+hyp_purge_queues: false
 hyp_live_reader: false
 hyp_live_only_mode: false
 hyp_fetch_block: true
@@ -24,4 +24,23 @@ hyp_fetch_traces: true
 hyp_disable_reading: false
 hyp_disable_indexing: false
 hyp_process_deltas: true
-hyp_max_inline: 20
+hyp_disable_delta_rm: true
+hyp_ds_pool_size: 1
+hyp_dyn_idx_queues: 1
+hyp_max_autoscale: 4
+hyp_batch_size: 5000
+hyp_resume_trigger: 5000
+hyp_auto_scale_trigger: 20000
+hyp_block_queue_limit: 10000
+hyp_max_queue_limit: 100000
+hyp_polling_interval: 10000
+
+rabbitmq_vhost: hyperion
+rabbitmq_user: changemeplz
+rabbitmq_password: plzusevault
+
+es_conf_path: /etc/elasticsearch/elasticsearch.yml
+es_jvm_opts_path: /etc/elasticsearch/jvm.options
+es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
+hyp_es_enable_xpack: true
+jvm_heap_size: 4g

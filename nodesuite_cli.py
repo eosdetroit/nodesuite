@@ -372,13 +372,11 @@ def setInventoryGroupVars(base_dir, overwrite):
     initializeConfig(path.join(base_dir, token.name, 'vars.yml'), overwrite)  
 
     f = open(path.join(base_dir, token.name, 'vars.yml'), 'a+')
-    f.write(f'name: {token.name}\n')
-    f.write(f'token_symbol: {token.value}\n')
-
-    #TODO: remove me? ask if you intend to snep shawt?
-    f.write(f'snapshot_base_url: \n')
-    f.write(f'snapshot_file: \n')
-    f.write(f'snapshot_provider: \n')
+    with open('./data/defaults', 'r') as file:
+        defaults = yaml.load(file, Loader=yaml.FullLoader)
+        for default in defaults[token.name]:
+            pass
+            f.write(f'{default}: {defaults[token.name][default]}\n')
 
 def setEnvironmentStageVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)

@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "ubuntu/bionic64"
-  config.vm.hostname = "eosio"
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.hostname = "leap"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -34,7 +34,7 @@ Vagrant.configure("2") do |config|
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
   config.vm.network "private_network", ip: "10.50.0.2"
-
+  
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
@@ -65,5 +65,5 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
-  config.vm.post_up_message = "Run the ansible playbooks in /vagrant/eosio-bp-playbooks on the guest machine." 
+  config.vm.post_up_message = "Run the ansible playbooks in /vagrant/nodesuite on the guest machine." 
 end

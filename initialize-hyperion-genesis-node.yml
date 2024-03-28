@@ -5,22 +5,9 @@
   become_user: root
   gather_facts: yes
   pre_tasks:
-     - raw: sudo apt-get update && sudo apt-get -y install python jq zstd git gnupg
+     - raw: sudo apt-get update && sudo apt-get -y install python3-pip zstd git gnupg
   roles:
     - { role: initialize_system }
-
-- hosts: '{{ target }}'
-  strategy: free
-  become: yes
-  become_user: '{{ deploy_user }}'
-  vars:
-    use_genesis_json: yes
-  vars_files:
-    - stage_vars/{{ name }}/{{ stage }}/vars.yml
-    - stage_vars/{{ name }}/{{ stage }}/vault.yml
-  roles:
-    - { role: build_source }
-    - { role: deploy_node }
 
 - hosts: '{{ target }}'
   strategy: free

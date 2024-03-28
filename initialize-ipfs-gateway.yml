@@ -1,0 +1,13 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: root
+  gather_facts: no
+  pre_tasks:
+     - raw: sudo apt-get update && sudo apt-get -y install python3-pip
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+  roles:
+    - { role: deploy_ipfs_gateway }
+    - { role: certbot }

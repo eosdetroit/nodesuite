@@ -5,7 +5,7 @@
   become_user: root
   gather_facts: yes
   pre_tasks:
-     - raw: sudo apt-get update && sudo apt-get -y install python jq zstd git
+     - raw: sudo apt-get update && sudo apt-get -y install python3-pip jq zstd git
   roles:
     - { role: initialize_system }
 

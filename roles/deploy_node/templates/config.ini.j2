@@ -5,9 +5,21 @@ wasm-runtime = {{ wasm_runtime }}
 eos-vm-oc-compile-threads = 4
 eos-vm-oc-enable = 1
 {% endif %}
+
+# Override default maximum ABI serialization time allowed in ms (eosio::chain_plugin)
+abi-serializer-max-time-ms = {{ abi_serializer_max_time_ms }}
+
+# Maximum size (in MiB) of the chain state database (eosio::chain_plugin)
 {% if chain_state_db_size_mb %}
 chain-state-db-size-mb = {{ chain_state_db_size_mb }}
 {% endif %}
+
+# Database read mode ("speculative", "head", "read-only", "irreversible").
+# In "speculative" mode database contains changes done up to the head block plus changes made by transactions not yet included to the blockchain.
+# In "head" mode database contains changes done up to the current head block.
+# In "read-only" mode database contains changes done up to the current head block and transactions cannot be pushed to the chain API.
+# In "irreversible" mode database contains changes done up to the last irreversible block and transactions cannot be pushed to the chain API.
+#  (eosio::chain_plugin)
 {% if setup_producer | bool %}
 read-mode = speculative
 {% else %}
@@ -24,9 +36,44 @@ contracts-console = true
 http-server-address = {{ http_server_ip }}:{{ http_server_port }}
 http-threads = {{ http_threads }}
 max-clients = {{ max_clients }}
+
+database-map-mode = {{ database_map_mode }}
+
+access-control-allow-origin = *
+access-control-allow-headers = Origin, X-Requested-With, Content-Type, Accept
+verbose-http-errors = true
+http-validate-host = false
+
+# The public endpoint of a peer node to connect to. Use multiple p2p-peer-address options as needed to compose a network. (eosio::net_plugin)
+# p2p-peer-address =
+{% for peer in peers %}
+p2p-peer-address = {{ peer }}
+{% endfor %}
+
+# The name supplied to identify this node amongst the peers. (eosio::net_plugin)
+{% if agent_name  %}
+agent-name = "{{ agent_name }}"
+{% endif %}
+
+# Optional public key of peer allowed to connect.  May be used multiple times. (eosio::net_plugin)
+# peer-key =
+{% if peer_keys %}
+	{% for peer_key in peer_keys %}
+	peer-key = {{ peer_key }}
+	{% endfor %}
+{% endif %}
+
+{% if peer_pubkey and peer_privkey %}
+# Tuple of [PublicKey, WIF private key] (may specify multiple times) (eosio::net_plugin)
+peer-private-key = ["{{ peer_pubkey }}", "{{ peer_privkey }}"]
+{% endif %}
+
+# Number of worker threads in net_plugin thread pool (eosio::net_plugin)
 net-threads = {{ net_threads }}
 sync-fetch-span = {{ sync_fetch_span }}
+
 max-transaction-time = {{ max_transaction_time }}
+read-only-read-window-time-us = {{ read_only_read_window_time_us }}
 p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
 {% if producer_name %}
 trusted-producer = {{ producer_name }}
@@ -37,21 +84,23 @@ last-block-time-offset-us = {{ last_block_time_offset_us }}
 {% if producer_threads %}
 producer-threads = {{ producer_threads }}
 {% endif %}
-{% for plugin in plugins %}
+{% for plugin in plugins %}last-block-cpu-effort-percent
 plugin = {{ plugin }}
 {% endfor %}
 {% if setup_producer | bool %}
 plugin = eosio::producer_plugin
 plugin = eosio::producer_api_plugin
 producer-name = {{ producer_name }}
+{% if is_failover | bool %}
+signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_signing_key }}
+{% else %}
 signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
 {% endif %}
+
 {% if pause_on_startup %}
 pause-on-startup = {{ pause_on_startup }}
 {% endif %}
-{% for peer in peers %}
-p2p-peer-address = {{ peer }}
-{% endfor %}
+
 {% if setup_hyperion | bool %}
 http-validate-host = false
 state-history-endpoint = 127.0.0.1:8887
@@ -63,12 +112,31 @@ plugin = eosio::state_history_plugin
 {% if 'leap' not in package %}
 {% if last_block_cpu_effort_percent %}
 last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
+
+{% if not disable_subjective_api_billing | default(false) | bool %}
+disable-subjective-api-billing = {{ disable_subjective_api_billing }}
+{% endif %}
+{% if not disable_subjective_p2p_billing | default(false) | bool %}
+disable-subjective-p2p-billing = {{ disable_subjective_p2p_billing }}
 {% endif %}
 {% if cpu_effort_percent %}
 cpu-effort-percent = {{ cpu_effort_percent }}
 {% endif %}
+
 reversible-blocks-db-size-mb = {{ reversible_blocks_db_size_mb }}
 {% if txn_test_gen_threads %}
 txn-test-gen-threads = {{ txn_test_gen_threads }}
 {% endif %}
+
+# Plugin(s) to enable, may be specified multiple times
+# plugin =
+{% for plugin in plugins %}
+plugin = {{ plugin }}
+{% endfor %}
+
+{% if setup_state_history | d() | bool %}
+trace-history = true
+chain-state-history = true
+state-history-endpoint = {{ state_history_server_ip }}:{{ state_history_server_port }}
+plugin = eosio::state_history_plugin
 {% endif %}

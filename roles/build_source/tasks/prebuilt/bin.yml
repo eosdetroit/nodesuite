@@ -1,11 +1,24 @@
 ---
+- name: Print variable value
+  debug: 
+      "msg={{ package }}"
+
 - name: Copying {{ package }} to host
   copy:
-    src: '{{ name }}/{{ package }}'
-    dest: '{{ working_dir }}/dist/{{ package }}'
-    owner: '{{ deploy_user }}'
-    group: '{{ deploy_group }}'
-  when: bin_src == 'local'
+    src: "{{ name }}/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name not in ['eos', 'proton', 'telos', 'libre', 'ore']
+
+- name: Copying {{ package }} to host
+  copy:
+    src: "eos/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name in ['eos', 'proton', 'telos', 'libre', 'ore']
+
 
 - name: Download {{ package }} to host
   get_url:
@@ -17,7 +30,7 @@
 
 - name: Clean old package version
   apt:
-    name: eosio
+    name: leap
     state: absent
   become: yes
   become_user: root
@@ -28,9 +41,9 @@
   become: yes
   become_user: root
 
-- name: Preparing to version programs
+- name: Preparing to version binaries
   file:
-    path: '{{ working_dir }}/versions/{{ version }}/{{ item }}'
+    path: '{{ working_dir }}/versions/{{ version }}/'
     state: directory
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
@@ -38,12 +51,15 @@
     - '{{ nodeos_bin }}'
     - '{{ cli_bin }}'
     - '{{ keosd_bin }}'
+    - '{{ blocklog_bin }}'
+    - '{{ trace_api_bin }}'
 
-- name: Versioning programs
+
+- name: Versioning binaries
   copy:
     remote_src: yes
     src: '{{ pkg_install_path }}/{{ item }}'
-    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
     mode: u+rwx
@@ -53,3 +69,19 @@
     - '{{ nodeos_bin }}'
     - '{{ cli_bin }}'
     - '{{ keosd_bin }}'
+    - '{{ trace_api_bin }}'
+
+- name: Versioning utility tool binaries
+  copy:
+    remote_src: yes
+    src: '{{ pkg_install_path }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    mode: u+rwx
+  become: yes
+  become_user: root
+  loop:
+    - '{{ blocklog_bin }}'
+    - '{{ leap_util_bin }}'
+  ignore_errors: yes

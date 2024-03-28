@@ -10,3 +10,4 @@ host_vars
 stage_vars
 inventories
 .private/*
+*.log

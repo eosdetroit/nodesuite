@@ -6,8 +6,8 @@
 
 - name: Setup nginx vhost conf
   template:
-    src: eosio-vhost.conf.j2
-    dest: /etc/nginx/sites-enabled/eosio-vhost.conf
+    src: leap-vhost.conf.j2
+    dest: /etc/nginx/sites-enabled/leap-vhost.conf
 
 - name: restart nginx
   service:

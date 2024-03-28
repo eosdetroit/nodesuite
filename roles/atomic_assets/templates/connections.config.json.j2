@@ -1,0 +1,19 @@
+{
+  "postgres": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "user": "{{ db_user }}",
+    "password": "{{ db_password }}",
+    "database": "{{ db_name }}"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  },
+  "chain": {
+    "name": "{{ name }}-{% if stage=="prod" %}main{% else %}{{ stage }}{% endif %}net",
+    "chain_id": "{{ chain_id }}",
+    "http": "http://{{ http_addr }}:{{ http_port }}",
+    "ship": "ws://{{ http_addr }}:{{ ws_port }}"
+  }
+}

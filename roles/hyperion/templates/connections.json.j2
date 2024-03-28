@@ -2,11 +2,14 @@
   "amqp": {
     "host": "127.0.0.1:5672",
     "api": "127.0.0.1:15672",
+    "protocol": "http",
     "user": "{{ rabbitmq_user }}",
     "pass": "{{ rabbitmq_password }}",
-    "vhost": "{{ rabbitmq_vhost }}"
+    "vhost": "{{ rabbitmq_vhost }}",
+    "frameMax": "0x10000"
   },
   "elasticsearch": {
+    "protocol": "http",
     "host": "127.0.0.1:{{ hyp_es_port }}",
     "ingest_nodes": ["127.0.0.1:{{ hyp_es_port }}"],
     "user": "{{ hyp_es_api_basic_auth_username }}",

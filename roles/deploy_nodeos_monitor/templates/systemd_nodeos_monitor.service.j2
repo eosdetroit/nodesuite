@@ -1,0 +1,12 @@
+[Unit]
+Description=Nodeos monitoring/alerting
+After=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+ExecStart=/usr/bin/python3 /opt/monitoring/systemd_nodeos_monitor.py
+
+[Install]
+WantedBy=multi-user.target

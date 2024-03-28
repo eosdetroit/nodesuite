@@ -8,11 +8,11 @@
   become: yes
   become_user: root
 
-- name: Checking out eosio version {{ version }}
+- name: Checking out leap version {{ version }}
   git:
     repo: '{{ git_repo }}'
     clone: yes
-    dest: '{{ working_dir }}/src/eosio'
+    dest: '{{ working_dir }}/src/leap'
     version: '{{ version }}'
     recursive: yes
     accept_hostkey: yes
@@ -22,7 +22,7 @@
 
 - name: Set repo permissions to deploy user
   file:
-    dest: '{{ working_dir }}/src/eosio'
+    dest: '{{ working_dir }}/src/leap'
     owner: '{{ deploy_user }}'
     group: '{{ deploy_group }}'
     recurse: yes
@@ -34,7 +34,7 @@
   when: apply_patch | bool
 
 - name: Running build script
-  shell: src/eosio/scripts/{{ build_script }}  -y -P -i vendor -s {{ token_symbol | quote }} {{ mongo_flag }} 
+  shell: src/leap/scripts/{{ build_script }}  -y -P -i vendor -s {{ token_symbol | quote }}
   become: yes
   args:
     executable: /bin/bash
@@ -58,6 +58,6 @@
 - name: Versioning built programs
   copy:
     remote_src: yes
-    src: '{{ working_dir }}/src/eosio/build/programs/'
+    src: '{{ working_dir }}/src/leap/build/programs/'
     dest: '{{ working_dir }}/versions/{{ version }}'
     mode: preserve

@@ -1,7 +1,7 @@
 ---
-voter_working_dir: /opt/eosio/dist
-deploy_user: eosio
-deploy_group: eosio
+voter_working_dir: /opt/leap/dist
+deploy_user: leap
+deploy_group: leap
 register_fio_domain: 40000000000
 register_fio_address: 2000000000
 renew_fio_domain: 40000000000

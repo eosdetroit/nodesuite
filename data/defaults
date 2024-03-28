@@ -16,14 +16,13 @@ producer:
     setup_producer: yes
     setup_claims: yes
     claims_wallet_name: claims
-    cpu_effort_percent: 40
-    last_block_cpu_effort_percent: 25
 
 state_history:
     setup_state_history: yes
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8080
     eos_vm_oc_enable: yes
+    disable_subjective_api_billing: false
 
 v1_history:
     setup_v1_history: yes
@@ -32,7 +31,7 @@ hyperion:
     setup_hyperion: yes
     setup_state_history: yes
     api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
-    hyperion_version: 3.3.5
+    hyperion_version: v3.3.5
     rabbitmq_username: "rabbitusername"
     rabbitmq_password: '{{ vault_rabbitmq_password }}'
     http_proxy_port: 7000
@@ -41,25 +40,17 @@ hyperion:
     es_master_node: true
     es_data_node: false
     hyp_es_version: 7.8.1
-    es_data_dir: /opt/eosio/deploy/elasticsearch
     es_conf_path: /etc/elasticsearch/elasticsearch.yml
     es_jvm_opts_path: /etc/elasticsearch/jvm.options
     es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
-    hyp_es_api_basic_auth_username: "elastic"
-    hyp_es_api_basic_auth_password: '{{ vault_es_api_basic_auth_password }}'
     hyp_es_enable_xpack: true
     jvm_heap_size: 8g
 
 seed:
     node_type: seed
-
-mongo:
-    setup_mongo: yes
-    mongo_git_repo: https://github.com/CryptoLions/EOS-mongo-history-API
-    mongo_api_version: master
-    http_proxy_port: 3333
-    service_name: mongoapi
-    mongo_flag: -m
+    disable_subjective_p2p_billing: false
+chain_api:
+    disable_subjective_api_billing: false
 nginx:
     setup_nginx: yes
 
@@ -71,20 +62,20 @@ fio:
     name: fio
     token_symbol: FIO
     git_repo: https://github.com/fioprotocol/fio.git
-    version: v2.0.0
+    version: v3.3.0
     prebuilt: yes
-    package: fioprotocol-1.1.0-rc1-ubuntu-18.04-amd64.deb
+    package: fioprotocol-3.3.0-ubuntu-18.04-amd64.deb
     bin_package: yes
     bin_src: local
     pkg_install_path: /usr/local/bin
     cli_bin: clio
+    keosd_bin: fio-wallet
+    nodeos_bin: fio-nodeos
     http_max_response_time_ms:
     build_script: fio_build.sh
     max_clients: 100
     claim_account: fio.treasury
     claim_action: bpclaim
-    cpu_effort_percent:
-    last_block_cpu_effort_percent:
     wasm_runtime: wabt
     apply_patch: no
 
@@ -146,32 +137,33 @@ proton:
 telos:
     name: telos
     token_symbol: TLOS
-    peer_publickey:
-    peer_privkey:
-    peer_keys:
+    peer_publickey: ''
+    peer_privkey: ''
+    peer_keys: ''
     chain_state_db_size_mb: 16384
 
 wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/cc32d9/wax2.0.git
-    version: v2.0.6wax02
+    version: 5.0.0wax01
+    pkg_install_path: /usr/bin
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
     claim_action: claimgbmprod
     prebuilt: yes
-    package: wax
-    apt_package: yes
-    bin_package: no
+    apt_package: no
+    bin_package: yes
+    bin_src: local
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
-    wasm_runtime: wabt
-    last_block_time_offset_us: -300000
+    package: wax-leap_5.0.0wax01_amd64.deb
+    wasm_runtime: eos-vm-jit
 
 all:
-    working_dir: /opt/eosio
-    deploy_user: eosio
-    deploy_group: eosio
+    working_dir: /opt/leap
+    deploy_user: leap
+    deploy_group: leap
     agent_name: default
     producer_name: default
     provider_website: https://default.io
@@ -184,27 +176,31 @@ all:
     http_proxy_port: 8888
     state_history_server_ip: 127.0.0.1
     state_history_server_port: 8887
-    genesis_json_path: /opt/eosio/deploy/genesis.json
-    git_repo: https://github.com/EOSIO/eos.git
-    peer_pubkey:
-    peer_privkey:
-    peer_keys:
-    mongo_flag:
-    setup_block_storage:
+    genesis_json_path: /opt/leap/deploy/genesis.json
+    git_repo: https://github.com/AntelopeIO/leap.git
+    peer_pubkey: ''
+    peer_privkey: ''
+    peer_keys: ''
+    setup_block_storage: ''
     wasm_runtime: eos-vm-jit
     prebuilt: yes
     bin_package: yes
     bin_src: remote
-    bin_package_base_url: https://github.com/eosio/eos/releases/download
-    version: v2.0.8
-    package: eosio_2.0.8-1-ubuntu-18.04_amd64.deb
-    build_script: eosio_build.sh
-    apply_patch:
-    force_build:
-    setup_hyperion:
-    setup_oracle: 
-    setup_oig: 
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    version: v5.0.0
+    package: leap_5.0.0_amd64.deb
+    build_script: pinned_build.sh
+    apply_patch: ''
+    force_build: ''
+    setup_hyperion: ''
+    setup_oracle: no
     nodeos_bin: nodeos
     cli_bin: cleos
     keosd_bin: keosd
-    testnet_name:
+    blocklog_bin: eosio-blocklog
+    trace_api_bin: trace_api_util
+    leap_util_bin: leap-util
+    testnet_name: ''
+    abi_serializer_max_time_ms: 20000
+    disable_subjective_api_billing: true
+    disable_subjective_p2p_billing: true
