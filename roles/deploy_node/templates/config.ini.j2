@@ -1,12 +1,10 @@
-{% if wasm_runtime %}
 wasm-runtime = {{ wasm_runtime }}
-{% endif %}
+
 {% if wasm_runtime == "eos-vm-jit" and eos_vm_oc_enable %}
 eos-vm-oc-compile-threads = 4
 eos-vm-oc-enable = 1
 {% endif %}
 
-# Override default maximum ABI serialization time allowed in ms (eosio::chain_plugin)
 abi-serializer-max-time-ms = {{ abi_serializer_max_time_ms }}
 
 # Maximum size (in MiB) of the chain state database (eosio::chain_plugin)
@@ -25,6 +23,7 @@ read-mode = speculative
 {% else %}
 read-mode = head
 {% endif %}
+
 {% if ((node_type == "seed") and (name != "fio")) %}
 p2p-accept-transactions = false 
 {% endif %}
@@ -78,19 +77,17 @@ p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
 {% if producer_name %}
 trusted-producer = {{ producer_name }}
 {% endif %}
-{% if last_block_time_offset_us %}
-last-block-time-offset-us = {{ last_block_time_offset_us }}
-{% endif %}
+
 {% if producer_threads %}
 producer-threads = {{ producer_threads }}
 {% endif %}
-{% for plugin in plugins %}last-block-cpu-effort-percent
-plugin = {{ plugin }}
-{% endfor %}
+
 {% if setup_producer | bool %}
 plugin = eosio::producer_plugin
 plugin = eosio::producer_api_plugin
 producer-name = {{ producer_name }}
+{% endif %}
+
 {% if is_failover | bool %}
 signature-provider = {{ failover_public_signing_key }}=KEY:{{ failover_private_signing_key }}
 {% else %}
@@ -101,32 +98,11 @@ signature-provider = {{ public_signing_key }}=KEY:{{ private_signing_key }}
 pause-on-startup = {{ pause_on_startup }}
 {% endif %}
 
-{% if setup_hyperion | bool %}
-http-validate-host = false
-state-history-endpoint = 127.0.0.1:8887
-plugin = eosio::history_plugin
-plugin = eosio::history_api_plugin
-plugin = eosio::state_history_plugin
-{% endif %}
-
-{% if 'leap' not in package %}
-{% if last_block_cpu_effort_percent %}
-last-block-cpu-effort-percent = {{ last_block_cpu_effort_percent }}
-
 {% if not disable_subjective_api_billing | default(false) | bool %}
 disable-subjective-api-billing = {{ disable_subjective_api_billing }}
-
 {% endif %}
 {% if not disable_subjective_p2p_billing | default(false) | bool %}
 disable-subjective-p2p-billing = {{ disable_subjective_p2p_billing }}
-{% endif %}
-{% if cpu_effort_percent %}
-cpu-effort-percent = {{ cpu_effort_percent }}
-{% endif %}
-
-reversible-blocks-db-size-mb = {{ reversible_blocks_db_size_mb }}
-{% if txn_test_gen_threads %}
-txn-test-gen-threads = {{ txn_test_gen_threads }}
 {% endif %}
 
 # Plugin(s) to enable, may be specified multiple times

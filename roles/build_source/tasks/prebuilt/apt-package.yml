@@ -63,5 +63,6 @@
   become: yes
   become_user: root
   loop:
+    - '{{ blocklog_bin }}'
     - '{{ leap_util_bin }}'
   ignore_errors: yes

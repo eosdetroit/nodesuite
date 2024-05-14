@@ -126,7 +126,6 @@ libre:
     producer_threads: 4
     sync_fetch_span: 500
     max_transaction_time: 150000
-    reversible_blocks_db_size_mb: 2048
     data_dir: deploy/data
 
 proton:
