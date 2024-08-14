@@ -102,13 +102,6 @@
   become: yes
   become_user: root
 
-- include: bootstrap/dsp.yml
-  when: 
-  - setup_dsp | bool
-  - not update_configs_only | bool
-  become: yes
-  become_user: root
-
 - include: bootstrap/oracle.yml
   when: 
   - setup_oracle | bool

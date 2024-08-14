@@ -91,9 +91,3 @@ for row in $(echo "${STAKE}" | jq -r '.rows' | jq -r '.[] | @base64'); do
     echo "$RESULT"
 done
 {% endif %}
-
-# dsp claim hack
-{% if name == "eos" %}
-RESULT=$(($EXEC push action dappservices claimrewards "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION) 2>&1)
-echo "$RESULT"
-{% endif %}

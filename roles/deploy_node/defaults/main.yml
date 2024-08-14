@@ -14,7 +14,6 @@ setup_hyperion:
 setup_state_history:
 setup_nginx:
 setup_producer:
-setup_dsp:
 setup_claims:
 setup_v1_history:
 service_name: nodeos
