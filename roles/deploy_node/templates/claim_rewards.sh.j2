@@ -79,6 +79,14 @@ RESULT=$(($EXEC push action {{ claim_account }} claimgbmvote "[\"$PRODUCER\"]" -
 echo "$RESULT"
 {% endif %}
 
+{% if name == "eos" %}
+# Claim bpay
+sleep 2s
+RESULT=$(($EXEC push action eosio.bpay {{ claim_action }} "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+# Raw output
+echo "$RESULT"
+{% endif %}
+
 {% if name == "proton" %}
 RESULT=$(($EXEC push action {{ claim_account }} voterclaim "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
 STAKE=$(($EXEC get table eosio.token $PRODUCER accounts) 2>&1)
