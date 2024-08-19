@@ -28,13 +28,32 @@
     state: link
     force: yes
   when: not update_configs_only | bool
-  
+
+- name: Check if peers file exists
+  stat:
+    path: "data/peers/{{ name }}/{{ stage }}/current.peers"
+  register: peers_file
+
+- name: Read peers file
+  set_fact:
+    peers: "{{ lookup('file', 'data/peers/{{ name }}/{{ stage }}/current.peers').splitlines() }}"
+  when: peers_file.stat.exists
+
 - name: Creating config.ini file
   template:
     src: 'config.ini.j2'
     dest: '{{ working_dir }}/deploy/config.ini'
     backup: yes
     mode: u=rw
+  when: not setup_hyperion | bool
+
+- name: Creating Hyperion config.ini file
+  template:
+    src: 'hyperion.config.ini.j2'
+    dest: '{{ working_dir }}/deploy/config.ini'
+    backup: yes
+    mode: u=rw
+  when: setup_hyperion | bool
 
 - include: snapshot/{{ snapshot_provider }}.yml
   when: 
@@ -52,6 +71,65 @@
     dest: '{{ working_dir }}/deploy/start.sh'
     mode: u+rwx
     force: yes
+  when: not setup_hyperion | bool
+
+- name: Installing nodeos Hyperion start script
+  template:
+    src: 'hyperion_start.sh.j2'
+    dest: '{{ working_dir }}/deploy/hyperion-start.sh'
+    mode: u+rwx
+    force: yes
+  when: setup_hyperion | bool
+
+- name: Installing nodeos genesis script
+  template:
+    src: 'genesis_start.sh.j2'
+    dest: '{{ working_dir }}/deploy/genesis_start.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing snapstart nodeos script
+  template:
+    src: 'snapstart.sh.j2'
+    dest: '{{ working_dir }}/deploy/snapstart.sh'
+    mode: u+rwx
+    force: yes
+  when: use_snapshot | bool
+
+- name: Installing nodeos quickrestart script
+  template:
+    src: 'quickrestart.sh.j2'
+    dest: '{{ working_dir }}/deploy/quickrestart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos chk_producer script
+  template:
+    src: 'chk_producer.sh.j2'
+    dest: '{{ working_dir }}/deploy/chk_producer.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos restart script
+  template:
+    src: 'restart.sh.j2'
+    dest: '{{ working_dir }}/deploy/restart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos stop script
+  template:
+    src: 'stop.sh.j2'
+    dest: '{{ working_dir }}/deploy/stop.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing crontab example text for backup producer
+  template:
+    src: 'crontab.j2'
+    dest: '{{ working_dir }}/deploy/crontab'
+    mode: u+rwx
+    force: yes    
 
 - name: Installing nodeos service config
   template:
@@ -78,6 +156,7 @@
     state: restarted
   become: yes
   become_user: root
+  when: not setup_hyperion | bool
 
 - name: Clearing nodeos flags on start.sh
   template:

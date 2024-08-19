@@ -54,8 +54,8 @@ install_kibana() {
   echo -e "\n\n\n\n"
   sudo apt install -y kibana
 
-  KIBANA_PASSWORD=$(awk </opt/leap/src/Hyperion-History-API/elastic_pass.txt '/PASSWORD kibana =/ {print $4}')
-  sudo sed -ie 's/#elasticsearch.password: "pass"/elasticsearch.password: '"$KIBANA_PASSWORD"'/; s/#elasticsearch.username: "kibana"/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
+  KIBANA_PASSWORD=$(awk </opt/eosio/src/Hyperion-History-API/elastic_pass.txt '/PASSWORD kibana =/ {print $4}')
+  sudo sed -ie 's/#elasticsearch.password: "pass"/elasticsearch.password: '"$KIBANA_PASSWORD"'/; s/elasticsearch.username: "kibana"/elasticsearch.username: "kibana"/' /etc/kibana/kibana.yml
 
   sudo systemctl enable kibana
   sudo systemctl start kibana

@@ -24,7 +24,6 @@ class TokenEnum(Enum):
     telos  = 'TLOS'
     wax    = 'WAXP'
     proton = 'XPR'
-
 class EnvironmentEnum(Enum):
     dev  = 'dev'
     test = 'test'
@@ -379,8 +378,6 @@ def setInventoryGroupVars(base_dir, overwrite):
             pass
             f.write(f'{default}: {defaults[token.name][default]}\n')
 
-    
-
 def setEnvironmentStageVars(base_dir, environment, overwrite):
     initializeConfig(path.join(base_dir, environment, 'vars.yml'), overwrite)
 
@@ -408,9 +405,9 @@ def setEnvironmentStageVars(base_dir, environment, overwrite):
         except Exception as e:
             logging.error(f'{e}')
 
-    f.write('snapshot_base_url: http://backup.cryptolions.io/Jungle/snapshots\n')
-    f.write('snapshot_file: latest-snapshot.bin\n')
-    f.write('snapshot_provider: cryptolions\n')
+    f.write('snapshot_base_url: \n')
+    f.write('snapshot_file: \n')
+    f.write('snapshot_provider: \n')
     f.write('private_signing_key: \'{{ vault_private_signing_key }}\'\n')
 
 

@@ -1,6 +1,6 @@
 ---
 - name: Register snapshot URL
-  shell: echo {{ snapshot_base_url }}/{{ snapshot_file }}
+  shell: echo {{ snapshot_base_url }}
   args: 
     executable: /bin/bash
   register: snapshot_url
@@ -8,12 +8,12 @@
 - name: Downloading latest {{ name }} snapshot from {{ snapshot_provider }}
   get_url:
     url: '{{ snapshot_url.stdout }}'
-    dest: '{{ working_dir }}/snapshots/snapshot.tar.gz'
+    dest: "{{ working_dir }}/snapshots/{{ snapshot_tar }}"
     force: yes
 
 - name: Unarchiving snapshot tarball
   unarchive:
-    src: '{{ working_dir }}/snapshots/snapshot.tar.gz'
+    src: "{{ working_dir }}/snapshots/{{ snapshot_tar }}"
     dest: '{{ working_dir }}/snapshots'
     remote_src: yes
 

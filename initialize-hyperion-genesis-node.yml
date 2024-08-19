@@ -3,9 +3,9 @@
   strategy: free
   become: yes
   become_user: root
-  gather_facts: no
+  gather_facts: yes
   pre_tasks:
-     - raw: sudo apt-get update && sudo apt-get -y install python3-pip
+     - raw: sudo apt-get update && sudo apt-get -y install python3-pip zstd git gnupg
   roles:
     - { role: initialize_system }
 
@@ -18,3 +18,4 @@
     - stage_vars/{{ name }}/{{ stage }}/vault.yml
   roles:
     - { role: hyperion, when: setup_hyperion | bool }
+    - { role: certbot, when: set_certbot | bool }
