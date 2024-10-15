@@ -78,8 +78,12 @@ p2p-listen-endpoint = {{ p2p_server_ip }}:{{ p2p_server_port }}
 trusted-producer = {{ producer_name }}
 {% endif %}
 
-{% if producer_threads %}
+{% if producer_threads and release_name != "spring" %}
 producer-threads = {{ producer_threads }}
+{% endif %}
+
+{% if vote_threads and release_name == "spring" %}
+vote-threads = {{ vote_threads }}
 {% endif %}
 
 {% if setup_producer | bool %}
