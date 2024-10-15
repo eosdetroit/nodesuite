@@ -66,3 +66,5 @@ is_failover: no
 pause_on_startup: false
 abi_serializer_max_time_ms: 20000
 database_map_mode: mapped
+release_name: leap
+vote_threads: 4
