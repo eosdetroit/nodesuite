@@ -1,9 +1,9 @@
 ---
 - name: Install python dependencies
   pip:
-    name: 
-    - pushover
-    - slack-sdk
+    name:
+      - pushover==0.5
+      - slack-sdk==3.26.2
 
 - name: Stop monitoring service
   systemd:
