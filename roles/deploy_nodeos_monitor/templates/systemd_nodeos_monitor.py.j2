@@ -1,96 +1,190 @@
+import signal
+import sys
+import os
 import select
-from time import sleep
+from time import time, sleep
 from systemd import journal
 import socket
-import atexit
 import pushover
-{% if slack_webhook_url is defined and slack_webhook_url | default('', true) | length > 0 %}
+import logging
+import subprocess
 from slack_sdk.webhook import WebhookClient
-
-webhook = WebhookClient('{{ slack_webhook_url }}') 
-{% endif %}
 
 hostname = socket.gethostname()
 
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
-client = pushover.PushoverClient("/opt/monitoring/.pushover") 
-{% endif %}
-
-
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
-def send_notification(message:str, message_title:str, message_priority:int, message_expire:int, message_retry:int):
-    client.send_message(message=message, title=message_title, priority=message_priority, expire=message_expire, retry=message_retry)
-
-atexit.register(
-    send_notification,
-    message='Stopped Nodeos Monitor.',
-    message_title=f'[{hostname}] Nodeos Monitor',
-    message_priority=0,
-    message_expire=3200,
-    message_retry=0
+logging.basicConfig(
+    filename='{{ base_dir }}/monitor.log',
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
 )
-{% endif %}
+
+pushover_client = None
+pushover_config_path = "{{ pushover_config_path }}"
+
+if os.path.exists(pushover_config_path):
+    try:
+        pushover_client = pushover.PushoverClient(pushover_config_path)
+        logging.info("Pushover client initialized successfully.")
+    except Exception as e:
+        logging.error(f"Failed to initialize Pushover client: {e}")
+else:
+    logging.warning(f"Pushover config file not found at {pushover_config_path}. Notifications via Pushover will be disabled.")
+
+slack_webhook_url = "{{ slack_webhook_url }}"
+slack_webhook = WebhookClient(slack_webhook_url) if slack_webhook_url else None
+
+if not slack_webhook:
+    logging.warning("Slack webhook URL not set. Notifications via Slack will be disabled.")
 
 alert_keywords = [
-    'plugin_startup',
-    'plugin_shutdown',
-    'exit',
+    'Blockchain started',
+    'nodeos successfully exiting',
     'error',
     'unlinked',
+    'unlinkable',
     'invalid',
+    'Snapshot initialization',
+    'store_chain_state',
     'incoming message length unexpected',
-    'Space usage warning'
+    'Space usage warning',
+    'Snapshot can only be used to initialize an empty database',
+    'readwrite_coro_excep',
+    'End of file',
+    'is_threshold_exceede'
 ]
 
 fatal_keywords = [
     'many open files',
-    'increase chain-state',
+    'chain-state',
     'handle_db_exhaustion',
     'killed',
     'dirty',
-    'complete',
     'corrupt',
     'state_history_write_exception',
     'missed a block in trace_history.log',
-    'rethrow',
-    'exceeded file system configured threshold'
+    'exceeded file system configured threshold',
+    'Gracefully shutdown',
+    'Segmentation fault'
 ]
 
 whitelist_keywords = [
     'Host not found',
     'Closing connection',
+    'closing',
     'canceled',
     'refused',
     'reset',
-    '0.0.0.0'
+    '0.0.0.0',
+    'incoming message length unexpected',
+    'Unlinkable',
+    'unlinkable',
+    'forkdb',
+    'Broken pipe',
+    'beast'
 ]
 
-j = journal.Reader()
-j.log_level(journal.LOG_INFO)
+def send_notification(message: str, message_title: str, message_priority: int, message_expire: int, message_retry: int):
+    if pushover_client:
+        try:
+            pushover_client.send_message(message=message, title=message_title, priority=message_priority, expire=message_expire, retry=message_retry)
+        except Exception as e:
+            logging.error(f"Failed to send Pushover notification: {e}")
 
-j.this_boot()
-j.this_machine()
+    if slack_webhook:
+        try:
+            slack_webhook.send(text=f"{message_title}: {message}")
+            logging.debug("Notification sent to Slack.")
+        except Exception as e:
+            logging.error(f"Failed to send Slack notification: {e}")
 
-j.add_match(
-    _SYSTEMD_UNIT=u'nodeos.service',
-)
+def check_service_status(service_name):
+    try:
+        result_status = subprocess.run(
+            ["systemctl", "status", service_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+        if "not-found" in result_status.stderr:
+            logging.error(f"Service '{service_name}' does not exist.")
+            return {"exists": False, "active": False}
 
-j.seek_tail()
-j.get_previous()
+        result_active = subprocess.run(
+            ["systemctl", "is-active", service_name],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+        is_active = result_active.stdout.strip() == "active"
+        return {"exists": True, "active": is_active}
+    except Exception as e:
+        logging.error(f"An error occurred while checking service status: {e}")
+        return {"exists": False, "active": False}
 
-p = select.poll()
 
-journal_fd = j.fileno()
-poll_event_mask = j.get_events()
-p.register(journal_fd, poll_event_mask)
+def handle_termination(signum, frame):
+    send_notification(
+        message='Stopped Nodeos Monitor.',
+        message_title=f'[{hostname}] Nodeos Monitor',
+        message_priority=0,
+        message_expire=3200,
+        message_retry=0,
+    )
+    logging.info("Nodeos Monitor stopped.")
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, handle_termination)
+signal.signal(signal.SIGINT, handle_termination)
 
 def main():
-    sleep(5)
+    service_name = "nodeos"
+    service_status = check_service_status(service_name)
+
+    if not service_status["exists"]:
+        send_notification(
+            f'Service {service_name} does not exist.',
+            f'[{hostname}] Nodeos Monitor',
+            0,
+            7200,
+            1200,
+        )
+        logging.error(f'Service {service_name} does not exist. Exiting.')
+        sys.exit(1)
+
+    if not service_status["active"]:
+        send_notification(
+            f'Service {service_name} is not running.',
+            f'[{hostname}] Nodeos Monitor',
+            0,
+            7200,
+            1200,
+        )
+        logging.error(f'Service {service_name} is not running. Exiting.')
+        sys.exit(1)
+
+    j = journal.Reader()
+    j.log_level(journal.LOG_INFO)
+    j.this_boot()
+    j.this_machine()
+    j.add_match(_SYSTEMD_UNIT=f'{service_name}.service')
+    j.seek_tail()
+    j.get_previous()
+
+    p = select.poll()
+    journal_fd = j.fileno()
+    poll_event_mask = j.get_events()
+    p.register(journal_fd, poll_event_mask)
+
+    last_fatal_time = 0
+    fatal_cooldown = 300
+    last_alert_time = 0
+    alert_cooldown = 60
+    whitelist_timestamps = []  
+    whitelist_threshold = 120 
+    time_window = 300 
+
     try:
-{% if slack_webhook_url is defined and slack_webhook_url | default('', true) | length > 0 %}
-        response = webhook.send(text=f'[{hostname}] Nodeos Monitor: Starting...')
-{% endif %}
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
         send_notification(
             f'Starting...',
             f'[{hostname}] Nodeos Monitor',
@@ -98,53 +192,65 @@ def main():
             3600,
             0,
         )
-{% endif %}
+        logging.info('Starting...')
         while True:
             if p.poll(250):
                 if j.process() == journal.APPEND:
                     for entry in j:
-                        if any(word in entry['MESSAGE'] for word in fatal_keywords):
-{% if slack_webhook_url is defined and slack_webhook_url | default('', true) | length > 0 %}
-                            response = webhook.send(text=f'[{hostname}] FATAL:\n{entry["MESSAGE"]}')
-{% endif %}
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
-                            send_notification(
-                                f'{entry["MESSAGE"]}',
-                                f'[{hostname}] FATAL - Nodeos Monitor',
-                                2,
-                                17200,
-                                300,
-                            )
-{% endif %}
-                            sleep(300)
-                            j.seek_tail()
-                            j.get_previous()
+                        log = entry.get('MESSAGE', '')
+                        fatal_keyword = next((word for word in fatal_keywords if word in log), None)
+                        if fatal_keyword:
+                            if time() - last_fatal_time > fatal_cooldown:
+                                logging.info(f'FATAL keyword detected: {fatal_keyword} - {log}')
+                                send_notification(
+                                    f'{log[:512]}',
+                                    f'[{hostname}] FATAL - Nodeos Monitor - Trigger: {fatal_keyword}',
+                                    2,
+                                    17200,
+                                    300,
+                                )
+                                last_fatal_time = time()
+                                j.seek_tail()
+                                j.get_previous()
+                            continue
 
-                        if any(word in entry['MESSAGE'] for word in alert_keywords):
-                            if any(word in entry['MESSAGE'] for word in whitelist_keywords):
-                                continue
-{% if slack_webhook_url is defined and slack_webhook_url | default('', true) | length > 0 %}
-                            response = webhook.send(text=f'[{hostname}] ALERT:\n{entry["MESSAGE"]}')
-{% endif %}
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
-                            send_notification(
-                                f'{entry["MESSAGE"]}',
-                                f'[{hostname}] INFO - Nodeos Monitor',
-                                0,
-                                3600,
-                                300,
-                            )
-{% endif %}
-                            sleep(10)
-                            j.seek_tail()
-                            j.get_previous()
+                        alert_keyword = next((word for word in alert_keywords if word in log), None)
+                        if alert_keyword:
+                            if time() - last_alert_time > alert_cooldown:
+                                logging.info(f'ALERT keyword detected: {alert_keyword} - {log}')
+                                if any(word in log for word in whitelist_keywords):
+                                    whitelist_timestamps.append(time())
+                                    logging.debug(f'Whitelist keyword detected after alert_keyword trigger: {alert_keyword}.'
+                                                  f'Whitelist triggers within last {time_window}s: {len(whitelist_timestamps)}')
 
+                                    current_time = time()
+                                    whitelist_timestamps = [t for t in whitelist_timestamps if current_time - t <= time_window]
+
+                                    if len(whitelist_timestamps) >= whitelist_threshold:
+                                        send_notification(
+                                            f'Whitelist keyword spam detected: {alert_keyword}',
+                                            f'[{hostname}] WARNING - Nodeos Monitor',
+                                            0,
+                                            17200,
+                                            300,
+                                        )
+                                        logging.error(f'Whitelist keyword spam detected for {alert_keyword}.')
+                                        whitelist_timestamps = []
+                                    continue
+
+                                send_notification(
+                                    f'{log[:512]}',
+                                    f'[{hostname}] ALERT - Nodeos Monitor - Trigger: {alert_keyword}',
+                                    0,
+                                    3600,
+                                    300,
+                                )
+                                last_alert_time = time()
+                                j.seek_tail()
+                                j.get_previous()
+                            continue
     except Exception as ex:
-{% if slack_webhook_url is defined and slack_webhook_url | default('', true) | length > 0 %}
-        response = webhook.send(text=f'[{hostname}] Nodeos Monitor Exception: {ex}')
-{% endif %}
-
-{% if pushover_app_key is defined and pushover_app_key | default('', true) | length > 0 %}
+        logging.error(f"Exception occurred: {ex}")
         send_notification(
             f'{ex}',
             f'[{hostname}] Nodeos Monitor Exception: {type(ex).__name__}',
@@ -152,8 +258,7 @@ def main():
             7200,
             1200,
         )
-{% endif %}
-        sleep(600)
+
 
 if __name__ == "__main__":
     main()

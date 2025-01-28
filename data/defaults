@@ -59,9 +59,9 @@ eos:
     token_symbol: EOS
     bin_src: remote
     bin_package_base_url: https://github.com/AntelopeIO/spring/releases/download
-    package: antelope-spring_1.0.2_amd64.deb
+    package: antelope-spring_1.0.4_amd64.deb
     release_name: spring
-    version: v1.0.2
+    version: v1.0.4
 
 
 fio:
@@ -151,7 +151,7 @@ wax:
     name: wax
     token_symbol: WAX
     git_repo: https://github.com/eos-amsterdam-rnd/wax2.0.git
-    version: 5.0.1wax01
+    version: 5.0.3wax01
     pkg_install_path: /usr/bin
     chain_state_db_size_mb: 32768
     snapshot_provider: sweden
@@ -162,7 +162,7 @@ wax:
     bin_src: local
     pkg_gpg_key: https://apt.waxsweden.org/key
     pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
-    package: wax-leap_5.0.1wax01_amd64.deb
+    package: wax-leap_5.0.3wax01_amd64.deb
     wasm_runtime: eos-vm-jit
 
 all:
