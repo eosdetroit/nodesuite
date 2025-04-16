@@ -57,11 +57,11 @@ nginx:
 eos:
     name: eos
     token_symbol: EOS
-    bin_src: remote
+    bin_src: local
     bin_package_base_url: https://github.com/AntelopeIO/spring/releases/download
-    package: antelope-spring_1.1.2_amd64.deb
+    package: antelope-spring_1.1.3_amd64.deb
     release_name: spring
-    version: spring-v1.1.2
+    version: spring-v1.1.3
 
 
 fio:
