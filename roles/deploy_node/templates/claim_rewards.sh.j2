@@ -64,12 +64,17 @@ done
 $EXEC wallet lock_all
 $EXEC wallet unlock -n $CLAIM_PERMISSION --password $CLAIM_WALLET_PASS
 
+{% if name in ["vaulta", "eos"] %}
+RESULT=$(($EXEC push action eosio.bpay claimrewards "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
+echo "$RESULT"
+{% endif %}
+
 {% if name != "fio" %}
 RESULT=$(($EXEC push action {{ claim_account }} {{ claim_action }} "[\"$PRODUCER\"]" -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
 {% else %}
 RESULT=$(($EXEC push action {{ claim_account }} {{ claim_action }} '{"fio_address":"'$FIO_ADDRESS'","actor":"'$PRODUCER'"}' -p $PRODUCER@$CLAIM_PERMISSION -x 1000) 2>&1)
 {% endif %}
-# Raw output
+
 echo "$RESULT"
 
 {% if name == "wax" %}

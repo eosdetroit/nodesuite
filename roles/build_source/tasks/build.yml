@@ -8,7 +8,7 @@
   become: yes
   become_user: root
 
-- name: Checking out leap version {{ version }}
+- name: Checking out AntelopeIO version {{ version }}
   git:
     repo: '{{ git_repo }}'
     clone: yes
