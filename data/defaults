@@ -62,6 +62,8 @@ eos:
     package: antelope-spring_1.2.1_amd64.deb
     release_name: spring
     version: spring-v1.2.1
+    claim_account: core.vaulta
+    claim_action: claimrewards
 
 
 fio:
