@@ -12,3 +12,4 @@ inventories
 .private/*
 *.log
 .gitmodules
+*.deb
