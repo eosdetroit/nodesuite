@@ -1,0 +1,9 @@
+---
+name: ipfs
+service_name: ipfs
+node_type: ipfs
+setup_nginx: yes
+api_endpoint: ipfs.PLACEHOLDER.com
+ipfs_ip: 127.0.0.1
+ipfs_port: 8080
+binary_dir: /usr/local/bin

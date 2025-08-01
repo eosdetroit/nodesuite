@@ -1,0 +1,11 @@
+#Min  Hour Day  Mon  Weekday
+#*    *    *    *    *  command to be executed
+#┬    ┬    ┬    ┬    ┬
+#│    │    │    │    └─  Weekday  (0=Sun .. 6=Sat)
+#│    │    │    └──────  Month    (1..12)
+#│    │    └───────────  Day      (1..31)
+#│    └────────────────  Hour     (0..23)
+#└─────────────────────  Minute   (0..59)
+
+*/1 * * * * /opt/eosio/deploy/chk_producer.sh >> /opt/eosio/deploy/chk_producer.log
+0 */2 * * * echo "$(tail -n 100 /opt/eosio/deploy/chk_producer.log)" > /opt/eosio/deploy/chk_producer.log

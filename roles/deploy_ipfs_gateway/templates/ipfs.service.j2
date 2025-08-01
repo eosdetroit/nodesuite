@@ -1,0 +1,12 @@
+[Unit]
+Description=IPFS Gateway Server
+After=network.target
+
+[Service]
+User=root
+Restart=always
+ExecStart={{ binary_dir }}/ipfs daemon
+TimeoutSec=0
+
+[Install]
+WantedBy=multi-user.target

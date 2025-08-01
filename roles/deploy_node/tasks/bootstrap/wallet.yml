@@ -1,0 +1,22 @@
+---
+- name: check if wallet file exists
+  stat: 
+    path:  /home/{{ deploy_user }}/eosio-wallet/{{ wallet_name }}.wallet
+  register: wallet_file
+
+- name: Delete wallet file to refresh keys
+  file:
+    path: /home/{{ deploy_user }}/eosio-wallet/{{ wallet_name }}.wallet
+  when: wallet_file.stat.exists == True
+
+- name: Template setup_wallet script
+  template:
+    src: 'setup_wallet.sh.j2'
+    dest: '{{ working_dir }}/dist/setup_wallet.sh'
+    mode: u+rwx
+
+- name: Execute setup_wallet.sh
+  shell: "{{ working_dir }}/dist/setup_wallet.sh"
+  args:
+    executable: /bin/bash
+    creates: /home/{{ deploy_user }}/eosio-wallet/{{ wallet_name }}.wallet

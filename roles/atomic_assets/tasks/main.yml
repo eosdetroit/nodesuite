@@ -1,0 +1,167 @@
+---
+#Git Clone
+- name: Cloning Atomic Assets API
+  git:
+    repo: 'https://github.com/pinknetworkx/eosio-contract-api'
+    clone: yes
+    dest: '{{ working_dir }}/src/eosio-contract-api'
+
+#NodeJS
+- name: Setting up for nodejs v 16.x
+  shell: "curl -sL https://deb.nodesource.com/setup_16.x | bash -"
+
+- name: Install NodeJS
+  apt:
+    name: nodejs
+
+#Redis
+- name: Add apt repo for redis
+  apt_repository: 
+    repo: 'ppa:chris-lea/redis-server'
+
+- name: Install Redis Server
+  apt:
+    name: redis-server
+    update_cache: yes
+
+- name: restart redis and enable as service
+  service:
+    name: redis-server
+    state: restarted
+    enabled: yes
+
+#Yarn
+- name: Install frontend dep gpg keys
+  apt_key: url={{ item }}
+  with_items:
+    - https://dl.yarnpkg.com/debian/pubkey.gpg
+
+- name: Install frontend dep repos
+  apt_repository: repo={{ item }} update_cache=yes
+  with_items:
+    - deb https://dl.yarnpkg.com/debian/ stable main
+
+- name: Install yarn
+  apt:
+    name: yarn
+    update_cache: yes
+
+- name: Install app dependencies
+  yarn:
+    path: '{{ working_dir }}/src/eosio-contract-api'
+
+- name: Install pm2 node.js package globally.
+  community.general.yarn:
+    name: pm2
+    global: yes
+
+#PostgreSQL 13
+- name: Install dependencies
+  apt: 
+    name:
+      - wget
+      - bash-completion
+      - vim
+    state: latest
+
+- name: Get apt key dependencies
+  apt_key: url={{ item }}
+  with_items:
+    - https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+- name: Install dep repos
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    update_cache: yes
+
+- name: Install postgresql-13
+  apt:
+    name:
+      - postgresql-13
+      - postgresql-client-13
+    state: present
+    update_cache: yes
+
+#Setup DB/User
+- name: Install collection requirements
+  become: no
+  local_action: "command ansible-galaxy collection install community.postgresql"
+
+- name: Install pip3
+  apt:
+    name: python3-pip
+    update_cache: yes
+    state: present
+
+- name: psycopg2 requirements
+  apt:
+    name:
+     - python3-dev
+     - libpq-dev
+  
+- name: Make sure psycopg2 is installed
+  pip:
+    name: psycopg2
+    extra_args: "--no-binary :all:"
+
+- name: Create a new database
+  become: yes
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+
+- name: Create db user with encrypted password
+  become: yes
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    encrypted: yes
+
+- name: grant all privileges on database to  user
+  become: yes
+  become_user: postgres
+  community.postgresql.postgresql_privs:
+    type: database
+    db: "{{ db_name }}"
+    privs: ALL
+    roles: "{{ db_user }}"
+
+#PM2 Installs
+- name: Install pm2 globally
+  npm:
+    name: pm2
+    global: yes
+
+- name: server.config.json
+  template:
+    src: server.config.json.j2
+    dest: "{{ working_dir }}/src/eosio-contract-api/config/server.config.json"
+    mode: 0755
+    owner: "{{ deploy_user }}"
+
+- name: readers.config.json
+  template:
+    src: readers.config.json.j2
+    dest: "{{ working_dir }}/src/eosio-contract-api/config/readers.config.json"
+    mode: 0755
+    owner: "{{ deploy_user }}"
+
+- name: connections.config.json
+  template:
+    src: connections.config.json.j2
+    dest: "{{ working_dir }}/src/eosio-contract-api/config/connections.config.json"
+    mode: 0755
+    owner: "{{ deploy_user }}"
+
+- name: Starting filler
+  become_user: "{{ deploy_user }}"
+  shell:
+    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-filler"
+    chdir: "{{ working_dir }}/src/eosio-contract-api"
+
+- name: Starting filler
+  become_user: "{{ deploy_user }}"
+  shell:
+    cmd: "pm2 start ecosystems.config.json --only eosio-contract-api-server"
+    chdir: "{{ working_dir }}/src/eosio-contract-api"

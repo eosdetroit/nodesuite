@@ -1,0 +1,119 @@
+---
+- name: Check if chaincode is already installed
+  shell: export PATH="{{ workshop_path }}/bin:$PATH" && \. "$HOME/.nvm/nvm.sh" && peer chaincode query -n $CHAINCODE_NAME -C mychannel -c '{"Args":["org.hyperledger.fabric:GetMetadata"]}' | jq
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  register: chaincode_installed
+
+- name: Start kind
+  shell: just kind
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  when: chaincode_installed.stderr | length > 0
+
+- name: Apply fabric-operator
+  shell: kubectl apply -k https://github.com/hyperledger-labs/fabric-operator.git/config/crd
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0
+
+- name: Start cloud-network
+  shell: export PATH="{{ workshop_path }}/bin:$PATH" && \. "$HOME/.nvm/nvm.sh" && just cloud-network
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  when: chaincode_installed.stderr | length > 0
+
+- name: Create a channel
+  shell: export PATH="{{ workshop_path }}/bin:$PATH" && \. "$HOME/.nvm/nvm.sh" && just cloud-channel
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  when: chaincode_installed.stderr | length > 0
+
+- name: Perform a check
+  shell: | 
+    curl -s --cacert $WORKSHOP_CRYPTO/cas/org1-ca/tls-cert.pem \
+    https://$WORKSHOP_NAMESPACE-org1-ca-ca.$WORKSHOP_INGRESS_DOMAIN/cainfo | jq
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0
+
+- name: Get chaincode
+  shell: curl -LO https://github.com/hyperledgendary/full-stack-asset-transfer-guide/releases/download/v0.1.3/asset-transfer-typescript-v0.1.3.tgz
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0
+
+- name: Install chaincode
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && CORE_PEER_ADDRESS=${ORG1_PEER1_ADDRESS} peer lifecycle chaincode install $CHAINCODE_PACKAGE
+    export PATH="{{ workshop_path }}/bin:$PATH" && CORE_PEER_ADDRESS=${ORG1_PEER2_ADDRESS} peer lifecycle chaincode install $CHAINCODE_PACKAGE
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0
+
+- name: Calculate package id
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && echo $(peer lifecycle chaincode calculatepackageid $CHAINCODE_PACKAGE)
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  register: package_id
+  when: chaincode_installed.stderr | length > 0
+
+- name: Approve the contract for org1 
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && \. "$HOME/.nvm/nvm.sh" && peer lifecycle \
+    chaincode       approveformyorg \
+      --channelID     ${CHANNEL_NAME} \
+      --name          ${CHAINCODE_NAME} \
+      --version       ${VERSION} \
+      --package-id    {{ package_id.stdout }} \
+      --sequence      ${SEQUENCE} \
+      --orderer       ${ORDERER_ENDPOINT} \
+      --tls --cafile  ${ORDERER_TLS_CERT} \
+      --connTimeout   15s
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0
+
+- name: Commit the contract on the channel
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && \. "$HOME/.nvm/nvm.sh" && peer lifecycle \
+    chaincode       commit \
+      --channelID     ${CHANNEL_NAME} \
+      --name          ${CHAINCODE_NAME} \
+      --version       ${VERSION} \
+      --sequence      ${SEQUENCE} \
+      --orderer       ${ORDERER_ENDPOINT} \
+      --tls --cafile  ${ORDERER_TLS_CERT} \
+      --connTimeout   15s
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0  
+
+- name: Query the contract
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && peer chaincode query -n $CHAINCODE_NAME -C mychannel -c '{"Args":["org.hyperledger.fabric:GetMetadata"]}' | jq
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+  when: chaincode_installed.stderr | length > 0

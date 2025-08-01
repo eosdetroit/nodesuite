@@ -1,0 +1,62 @@
+---
+- name: Register org1 user
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && fabric-ca-client  register \
+      --id.name       $USERNAME \
+      --id.secret     $PASSWORD \
+      --id.type       client \
+      --url           https://$WORKSHOP_NAMESPACE-$ORG-ca-ca.$WORKSHOP_INGRESS_DOMAIN \
+      --tls.certfiles $WORKSHOP_CRYPTO/cas/$ORG-ca/tls-cert.pem \
+      --mspdir        $WORKSHOP_CRYPTO/enrollments/$ORG/users/rcaadmin/msp
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+
+- name: Enroll org1 user
+  shell: |
+    export PATH="{{ workshop_path }}/bin:$PATH" && fabric-ca-client enroll \
+      --url           https://$USERNAME:$PASSWORD@$WORKSHOP_NAMESPACE-$ORG-ca-ca.$WORKSHOP_INGRESS_DOMAIN \
+      --tls.certfiles $WORKSHOP_CRYPTO/cas/$ORG-ca/tls-cert.pem \
+      --mspdir        $WORKSHOP_CRYPTO/enrollments/$ORG/users/$USERNAME/msp
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+
+- name: Handle certificates
+  shell: mv $USER_MSP_DIR/keystore/*_sk $USER_MSP_DIR/keystore/key.pem
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  become: true
+
+- name: npm install
+  shell: \. "$HOME/.nvm/nvm.sh" && npm install
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}/applications/trader-typescript"
+
+- name: Create a yellow banana
+  shell: \. "$HOME/.nvm/nvm.sh" && npm start create banana bananaman yellow
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}/applications/trader-typescript"
+
+
+- name: Create a green banana
+  shell: \. "$HOME/.nvm/nvm.sh" && npm start create banana2 bananaman green
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}/applications/trader-typescript"
+
+- name: Get All Assets
+  shell: \. "$HOME/.nvm/nvm.sh" && echo $(npm start getAllAssets)
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}/applications/trader-typescript"
+  register: all_assets
+
+- name: Print all Assets
+  debug:
+    var: all_assets.stdout

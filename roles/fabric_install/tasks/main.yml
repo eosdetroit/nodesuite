@@ -1,0 +1,169 @@
+- name: Check kind
+  command: kind version
+  register: kind_version
+  ignore_errors: true
+
+- name: Download kind
+  get_url:
+    url: https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
+    dest: /usr/local/bin/kind
+    mode: '0755'
+  when: kind_version.rc != 0
+
+- name: Check kubectl
+  command: kubectl version
+  register: kubectl_version
+  ignore_errors: true
+
+- name: Download kubectl
+  get_url:
+    url: "https://dl.k8s.io/release/v1.33.3/bin/linux/amd64/kubectl"
+    dest: /usr/local/bin/kubectl
+    mode: '0755'
+  async: 300
+  poll: 10
+  when: kubectl_version.rc != 0
+
+- name: Update apt cache
+  command:
+    apt-get update
+
+- name: Install required packages
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - jq
+    state: present
+
+
+- name: Check docker
+  command: docker --version
+  register: docker_version
+  ignore_errors: true
+
+
+- name: Add Docker GPG key
+  shell: |
+    sudo install -m 0755 -d /etc/apt/keyrings &&
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc &&
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+  when: docker_version.rc != 0
+
+- name: Add Docker repository
+  shell: |
+    echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  args:
+    executable: /bin/bash
+  when: docker_version.rc != 0
+
+- name: Update apt cache after adding Docker repo
+  apt:
+    update_cache: yes
+  when: docker_version.rc != 0
+
+- name: Install Docker packages
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+  when: docker_version.rc != 0
+
+- name: Check just
+  command: just --version
+  register: just_version
+  ignore_errors: true
+
+- name: Install just
+  shell: |
+    curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+  args:
+    executable: /bin/bash
+  when: just_version.rc != 0
+
+- name: Check fabric-samples directory
+  stat:
+    path: /fabric-samples
+  register: fabric_samples_dir
+  ignore_errors: true
+
+- name: Download fabric-samples
+  shell: |
+    git clone https://github.com/hyperledger/fabric-samples.git /fabric-samples
+  args:
+    executable: /bin/bash
+  when: not fabric_samples_dir.stat.exists
+
+- name: Check peer binaries
+  shell: export PATH="{{ workshop_path }}/bin:$PATH" && peer version
+  ignore_errors: true
+  register: peer_version
+  args:
+    executable: /bin/bash
+  become_user: "{{ ansible_user }}"
+
+- name: Install fabric binaries
+  shell: curl -sSL https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh | bash -s -- binary
+  args:
+    executable: /bin/bash
+    chdir: "{{ workshop_path }}"
+  when: peer_version.rc != 0
+
+- name: Check node
+  shell: \. "$HOME/.nvm/nvm.sh" && node -v
+  register: node_version
+  ignore_errors: true
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Install node
+  shell: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+  args:
+    executable: /bin/bash
+  when: node_version.rc != 0
+
+- name: Install NodeJS 20
+  shell: \. "$HOME/.nvm/nvm.sh" && nvm install 20
+  args:
+    executable: /bin/bash
+  when: node_version.rc != 0
+
+- name: Check weft
+  shell: \. "$HOME/.nvm/nvm.sh" && weft --version
+  register: weft_version
+  ignore_errors: true
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Install weft
+  shell: \. "$HOME/.nvm/nvm.sh" && npm install -g @hyperledger-labs/weft
+  args:
+    executable: /bin/bash
+  when: weft_version.rc != 0
+
+- name: Check k9s
+  command: k9s version
+  register: k9s_version
+  ignore_errors: true
+
+- name: Install k9s
+  shell: |
+    curl --fail --silent --show-error -L https://github.com/derailed/k9s/releases/download/v0.25.3/k9s_Linux_x86_64.tar.gz -o /tmp/k9s_Linux_x86_64.tar.gz &&
+    tar -zxf /tmp/k9s_Linux_x86_64.tar.gz -C /usr/local/bin k9s &&
+    sudo chown root /usr/local/bin/k9s &&
+    sudo chmod 755 /usr/local/bin/k9s
+  args:
+    executable: /bin/bash
+  when: k9s_version.rc != 0
+
+

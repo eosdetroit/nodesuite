@@ -1,0 +1,60 @@
+---
+- name: Install frontend dep gpg keys
+  apt_key: url={{ item }}
+  with_items:
+    - https://dl.yarnpkg.com/debian/pubkey.gpg
+  become: yes
+  become_user: root
+
+- name: Install frontend dep repos
+  apt_repository: repo={{ item }} update_cache=yes
+  with_items:
+    - deb https://dl.yarnpkg.com/debian/ stable main
+  become: yes
+  become_user: root
+
+- name: Install frontend system dependencies
+  apt:
+    name:
+      - nodejs
+      - yarn
+      - nginx
+      - jq
+  become: yes
+  become_user: root
+
+- name: Create oracle directory
+  file:
+    path: '{{ working_dir }}/cron/oracle'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Copy package.json
+  copy:
+    src: 'oracle/package.json'
+    dest: '{{ working_dir }}/cron/oracle/package.json'
+
+- name: Install app dependencies
+  yarn:
+    path: '{{ working_dir }}/cron/oracle'
+
+- name: Setup oracle wallet
+  include_tasks:
+    file: wallet.yml
+  vars:
+    wallet_name: '{{ oracle_wallet_name }}'
+    wallet_private_key: '{{ oracle_private_key }}'
+
+- name: Template oracle script
+  template:
+    src: oracle/updater.js.j2
+    dest: '{{ working_dir }}/cron/oracle/updater.js'
+    mode: u+r
+
+- name: Install oracle script cron
+  cron:
+    name: delphi-oracle
+    job: "node {{ working_dir }}/cron/oracle/updater.js >> {{ working_dir }}/cron/oracle/{{ oracle_wallet_name }}.log 2>&1"
+    user: "{{ deploy_user }}"
+    minute: '{{ oracle_frequency_minute }}'

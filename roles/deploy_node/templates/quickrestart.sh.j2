@@ -1,0 +1,29 @@
+################################################################################
+#
+# Script Created by @bensig
+# Modified from scripts by http://CryptoLions.io
+# For EOS mainnet
+# https://github.com/CryptoLions/EOS-MainNet
+#
+###############################################################################
+MAINDIR={{ working_dir }}/deploy/
+DATADIR=$MAINDIR/data
+
+    if [ -f $DATADIR"/nodeos.pid" ]; then
+        pid=$(cat $DATADIR"/nodeos.pid")
+        echo $pid
+        kill $pid
+        rm -r $DATADIR"/nodeos.pid"
+
+        echo -ne "Stopping Nodeos"
+
+        while true; do
+            [ ! -d "/proc/$pid/fd" ] && break
+            echo -ne "."
+            sleep 1
+        done
+        echo -ne "\rNodeos stopped. \n"
+
+    fi
+
+$MAINDIR/nodeos --data-dir $DATADIR --config-dir $MAINDIR 2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid

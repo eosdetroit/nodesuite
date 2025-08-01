@@ -1,0 +1,25 @@
+# sync the local copy with latest changes from the upstream git repository.
+
+# TODO : Check here for return code of "git am" for failure.
+#
+# If <filename.patch> already applied, then :
+# - This is probably a cookbook re-run,
+#   or
+# - The latest upstream source now comes with the patch applied.
+# Display/Log an info message about this and skip to the end of the script.
+
+# Patch latest upstream source with a local patch
+{% for patch in patches %}
+echo "Attempting to apply {{ patch.name }}..." 
+cd {{ patch.patch_dir }}
+cat {{ working_dir }}/dist/patches/{{ patch.name }} | git am
+echo "Successfully applied {{ patch.name }}." 
+{% endfor %}
+# TODO : Check here for return code of "git am" for failure.
+#
+# In case <filename.patch> no longer applies 
+# to the latest version of the source from upstream repo,
+# display/log the error and abort immediately.
+
+
+# Continue with rest of the tasks.

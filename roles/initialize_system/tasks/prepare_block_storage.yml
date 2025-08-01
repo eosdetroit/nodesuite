@@ -1,0 +1,35 @@
+---
+- name: Format block filesystem
+  shell: "mkfs.ext4 /dev/vdb"
+  args:
+    executable: /bin/bash
+  when: provider == 'ibm'
+  
+- name: Create mount directory
+  file:
+    path: '/mnt/block-volume'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+  when: provider == 'ibm'
+
+- name: Mount block volume
+  shell: "mount -o defaults /dev/vdb /mnt/block-volume"
+  args:
+    executable: /bin/bash
+  when: provider == 'ibm'
+
+- name: Find block storage mount
+  find:
+    paths: '/mnt'
+    recurse: no
+    file_type: directory
+  register: mount_dir
+  
+- name: Linking working directory to block storage
+  file:
+    src: '{{ mount_dir.files[0].path }}'
+    path: '{{ working_dir }}'
+    state: link
+    force: yes
+  when: mount_dir.files[0] is defined

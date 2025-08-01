@@ -1,0 +1,6 @@
+#!/bin/bash
+################################################################################
+MAINDIR={{ working_dir }}/deploy
+DATADIR=$MAINDIR/data
+mkdir $DATADIR
+$MAINDIR/nodeos --data-dir $DATADIR --config-dir $MAINDIR --genesis-json $MAINDIR/genesis.json  --disable-replay-opts $@  2> $DATADIR/stderr.txt &  echo $! > $DATADIR/nodeos.pid

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+$({{ working_dir }}/dist/{{ cli_bin }} wallet create -n {{ wallet_name }} --file ~/{{ wallet_name }}.pw 2>&1)
+
+{{ working_dir }}/dist/{{ cli_bin }} wallet import --private-key {{ wallet_private_key }} -n {{ wallet_name }}

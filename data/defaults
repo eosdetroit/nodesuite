@@ -1,0 +1,212 @@
+dev:
+    chain_state_db_size_mb: 8192
+    stage: dev
+    jvm_heap_size: 4g
+    claims_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+    oig_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+    oracle_private_key: 5Kh9GJzP2ZmDCyBWY4pUSxjak85goounQYVwX5CmPrgSenbKgZ6
+
+test:
+    stage: test
+
+prod:
+    stage: prod
+
+producer:
+    setup_producer: yes
+    setup_claims: yes
+    claims_wallet_name: claims
+
+state_history:
+    setup_state_history: yes
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8080
+    eos_vm_oc_enable: yes
+    disable_subjective_api_billing: false
+
+v1_history:
+    setup_v1_history: yes
+
+hyperion:
+    setup_hyperion: yes
+    setup_state_history: yes
+    api_git_repo: https://github.com/eosrio/Hyperion-History-API.git
+    hyperion_version: v3.3.5
+    rabbitmq_username: "rabbitusername"
+    rabbitmq_password: '{{ vault_rabbitmq_password }}'
+    http_proxy_port: 7000
+    hyp_es_port: 9200
+    service_name: hyperionapi
+    es_master_node: true
+    es_data_node: false
+    hyp_es_version: 7.8.1
+    es_conf_path: /etc/elasticsearch/elasticsearch.yml
+    es_jvm_opts_path: /etc/elasticsearch/jvm.options
+    es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
+    hyp_es_enable_xpack: true
+    jvm_heap_size: 8g
+
+seed:
+    node_type: seed
+    disable_subjective_p2p_billing: false
+chain_api:
+    disable_subjective_api_billing: false
+nginx:
+    setup_nginx: yes
+
+eos:
+    name: eos
+    token_symbol: EOS
+    bin_src: remote
+    bin_package_base_url: https://github.com/AntelopeIO/spring/releases/download
+    package: antelope-spring_1.0.4_amd64.deb
+    release_name: spring
+    version: v1.0.4
+
+
+fio:
+    name: fio
+    token_symbol: FIO
+    git_repo: https://github.com/fioprotocol/fio.git
+    version: v3.3.0
+    prebuilt: yes
+    package: fioprotocol-3.3.0-ubuntu-18.04-amd64.deb
+    bin_package: yes
+    bin_src: local
+    pkg_install_path: /usr/local/bin
+    cli_bin: clio
+    keosd_bin: fio-wallet
+    nodeos_bin: fio-nodeos
+    http_max_response_time_ms:
+    build_script: fio_build.sh
+    max_clients: 100
+    claim_account: fio.treasury
+    claim_action: bpclaim
+    wasm_runtime: wabt
+    apply_patch: no
+
+libre:
+    name: libre
+    token_symbol: LIBRE 
+    wasm_runtime: eos-vm-jit
+    git_repo: https://github.com/AntelopeIO/leap.git
+    version: v5.0.3
+    prebuilt: yes
+    package: leap_5.0.3_amd64.deb
+    bin_package: yes
+    bin_src: remote
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    working_dir: /opt/libre
+    deploy_user: libre
+    deploy_group: libre
+    agent_name: libre
+    producer_name: quantum
+    provider_website: https://www.quantumblok.com/libre
+    pid_file: nodeos.pid
+    p2p_server_ip: 0.0.0.0
+    p2p_server_port: 9876
+    http_server_ip: 0.0.0.0
+    http_server_port: 8888
+    http_proxy_ip: 127.0.0.1
+    http_proxy_port: 8888
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8887
+    genesis_json_path: /opt/libre/deploy/genesis.json
+    snapshot_base_url: https://snapshots.eosusa.io/snapshots/libre/latest.tar.gz
+    snapshot_file: latest-snapshot.bin
+    snapshot_tar: latest-snapshot.bin.tar.gz
+    snapshot_dir: /opt/libre/snapshots
+    snapshot_provider: eosusa
+    setup_claims: no
+    use_snapshot: yes
+    plugins:
+      - eosio::chain_plugin
+      - eosio::chain_api_plugin
+      - eosio::http_plugin
+      - eosio::net_plugin
+    chain_state_db_size_mb: 32096
+    service_name: nodeos
+    eos_vm_oc_enable: yes
+    max_clients: 100
+    chain_threads: 2
+    producer_threads: 4
+    sync_fetch_span: 500
+    max_transaction_time: 150000
+    data_dir: deploy/data
+
+proton:
+    name: proton
+    token_symbol: SYS
+    wasm_runtime: eos-vm-jit
+
+telos:
+    name: telos
+    token_symbol: TLOS
+    peer_publickey: ''
+    peer_privkey: ''
+    peer_keys: ''
+    chain_state_db_size_mb: 16384
+
+wax:
+    name: wax
+    token_symbol: WAX
+    git_repo: https://github.com/eos-amsterdam-rnd/wax2.0.git
+    version: 5.0.3wax01
+    pkg_install_path: /usr/bin
+    chain_state_db_size_mb: 32768
+    snapshot_provider: sweden
+    claim_action: claimgbmprod
+    prebuilt: yes
+    apt_package: no
+    bin_package: yes
+    bin_src: local
+    pkg_gpg_key: https://apt.waxsweden.org/key
+    pkg_apt_repo: 'deb [arch=amd64] https://apt.waxsweden.org/wax bionic stable'
+    package: wax-leap_5.0.3wax01_amd64.deb
+    wasm_runtime: eos-vm-jit
+
+all:
+    working_dir: /opt/leap
+    deploy_user: leap
+    deploy_group: leap
+    agent_name: default
+    producer_name: default
+    provider_website: https://default.io
+    pid_file: nodeos.pid
+    p2p_server_ip: 0.0.0.0
+    p2p_server_port: 9876
+    http_server_ip: 0.0.0.0
+    http_server_port: 8888
+    http_proxy_ip: 127.0.0.1
+    http_proxy_port: 8888
+    state_history_server_ip: 127.0.0.1
+    state_history_server_port: 8887
+    genesis_json_path: /opt/leap/deploy/genesis.json
+    git_repo: https://github.com/AntelopeIO/leap.git
+    peer_pubkey: ''
+    peer_privkey: ''
+    peer_keys: ''
+    setup_block_storage: ''
+    wasm_runtime: eos-vm-jit
+    prebuilt: yes
+    bin_package: yes
+    bin_src: remote
+    bin_package_base_url: https://github.com/AntelopeIO/leap/releases/download
+    release_name: leap
+    version: v5.0.3
+    package: leap_5.0.3_amd64.deb
+    build_script: pinned_build.sh
+    apply_patch: ''
+    force_build: ''
+    setup_hyperion: ''
+    setup_oracle: no
+    nodeos_bin: nodeos
+    cli_bin: cleos
+    keosd_bin: keosd
+    blocklog_bin: eosio-blocklog
+    trace_api_bin: trace_api_util
+    leap_util_bin: leap-util
+    testnet_name: ''
+    abi_serializer_max_time_ms: 20000
+    disable_subjective_api_billing: true
+    disable_subjective_p2p_billing: true

@@ -1,0 +1,17 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+  when: setup_nginx
+
+- name: Setup nginx vhost conf
+  template:
+    src: ipfs-vhost.conf.j2
+    dest: /etc/nginx/sites-enabled/ipfs-vhost.conf
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
+

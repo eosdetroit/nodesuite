@@ -1,0 +1,14 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  become_user: '{{ deploy_user }}'
+  vars:
+    do_replay: yes
+    setup_nginx: no
+  roles:
+    - { role: build_source }
+    - { role: deploy_node }
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+    - 'stage_vars/{{ name }}/{{ stage }}/vault.yml'

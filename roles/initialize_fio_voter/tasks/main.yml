@@ -1,0 +1,16 @@
+---
+- name: Template FIO voting service
+  template:
+    src: fio_voting_service.py.j2
+    dest: '{{ voter_working_dir }}/fio_voting_service.py'
+    mode: u+wrx
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Run FIO voting service
+  shell: python3 fio_voting_service.py &
+  args: 
+    executable: /bin/bash
+    chdir: '{{ voter_working_dir }}'
+  become: yes
+  become_user: '{{ deploy_user }}'

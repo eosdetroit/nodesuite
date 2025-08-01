@@ -1,0 +1,9 @@
+{
+    "name": "delphi-oracle-updater",
+    "version": "1.0.0",
+    "dependencies": {
+        "eosjs": "^21.0.2",
+        "node-fetch": "^2.6.0",
+        "request": "^2.88.2"
+      }
+}

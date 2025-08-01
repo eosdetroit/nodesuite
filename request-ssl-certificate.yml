@@ -1,0 +1,8 @@
+---
+- hosts: '{{ target }}'
+  strategy: free
+  become: yes
+  vars_files:
+    - 'stage_vars/{{ name }}/{{ stage }}/vars.yml'
+  roles:
+    - role: certbot

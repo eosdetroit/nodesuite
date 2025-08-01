@@ -1,0 +1,187 @@
+---
+- name: Checking if version is built
+  stat:
+    path: '{{ working_dir }}/versions/{{ version }}'
+  register: has_version
+
+- block:
+  - name: "End play on host if version not present"
+    debug:
+      msg: "Target deploy version not present, ending play on host"
+  - meta: end_host
+  when: 
+    - has_version.stat.exists == False
+    - not update_configs_only | bool
+
+- name: Linking {{ nodeos_bin }} {{ version }} into deploy directory
+  file:
+    src: '{{ working_dir }}/versions/{{ version }}/{{ nodeos_bin }}'
+    path: '{{ working_dir }}/deploy/nodeos'
+    state: link
+    force: yes
+  when: not update_configs_only | bool
+
+- name: Linking {{ cli_bin }} {{ version }} into dist directory
+  file:
+    src: '{{ working_dir }}/versions/{{ version }}/{{ cli_bin }}'
+    path: '{{ working_dir }}/dist/{{ cli_bin }}'
+    state: link
+    force: yes
+  when: not update_configs_only | bool
+
+- name: Check if peers file exists
+  stat:
+    path: "data/peers/{{ name }}/{{ stage }}/current.peers"
+  register: peers_file
+
+- name: Read peers file
+  set_fact:
+    peers: "{{ lookup('file', 'data/peers/{{ name }}/{{ stage }}/current.peers').splitlines() }}"
+  when: peers_file.stat.exists
+
+- name: Creating config.ini file
+  template:
+    src: 'config.ini.j2'
+    dest: '{{ working_dir }}/deploy/config.ini'
+    backup: yes
+    mode: u=rw
+  when: not setup_hyperion | bool
+
+- name: Creating Hyperion config.ini file
+  template:
+    src: 'hyperion.config.ini.j2'
+    dest: '{{ working_dir }}/deploy/config.ini'
+    backup: yes
+    mode: u=rw
+  when: setup_hyperion | bool
+
+- include: snapshot/{{ snapshot_provider }}.yml
+  when: 
+    - use_snapshot | bool
+    - not update_configs_only | bool
+
+- include: bootstrap/block_log/main.yml
+  when: 
+    - dl_block_log | bool
+    - not update_configs_only | bool
+
+- name: Installing nodeos start script
+  template:
+    src: 'start.sh.j2'
+    dest: '{{ working_dir }}/deploy/start.sh'
+    mode: u+rwx
+    force: yes
+  when: not setup_hyperion | bool
+
+- name: Installing nodeos Hyperion start script
+  template:
+    src: 'hyperion_start.sh.j2'
+    dest: '{{ working_dir }}/deploy/hyperion-start.sh'
+    mode: u+rwx
+    force: yes
+  when: setup_hyperion | bool
+
+- name: Installing nodeos genesis script
+  template:
+    src: 'genesis_start.sh.j2'
+    dest: '{{ working_dir }}/deploy/genesis_start.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing snapstart nodeos script
+  template:
+    src: 'snapstart.sh.j2'
+    dest: '{{ working_dir }}/deploy/snapstart.sh'
+    mode: u+rwx
+    force: yes
+  when: use_snapshot | bool
+
+- name: Installing nodeos quickrestart script
+  template:
+    src: 'quickrestart.sh.j2'
+    dest: '{{ working_dir }}/deploy/quickrestart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos chk_producer script
+  template:
+    src: 'chk_producer.sh.j2'
+    dest: '{{ working_dir }}/deploy/chk_producer.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos restart script
+  template:
+    src: 'restart.sh.j2'
+    dest: '{{ working_dir }}/deploy/restart.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing nodeos stop script
+  template:
+    src: 'stop.sh.j2'
+    dest: '{{ working_dir }}/deploy/stop.sh'
+    mode: u+rwx
+    force: yes
+
+- name: Installing crontab example text for backup producer
+  template:
+    src: 'crontab.j2'
+    dest: '{{ working_dir }}/deploy/crontab'
+    mode: u+rwx
+    force: yes    
+
+- name: Installing nodeos service config
+  template:
+    src: 'nodeos.service.j2'
+    dest: '/etc/systemd/system/nodeos.service'
+  become: yes
+  become_user: root
+  
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+  become_user: root
+
+- include: genesis.yml
+  when: 
+    - use_genesis_json | bool
+    - not update_configs_only | bool
+
+- name: Starting nodeos
+  service:
+    name: nodeos
+    enabled: yes
+    state: restarted
+  become: yes
+  become_user: root
+  when: not setup_hyperion | bool
+
+- name: Clearing nodeos flags on start.sh
+  template:
+    src: 'start.sh.j2'
+    dest: '{{ working_dir }}/deploy/start.sh'
+    mode: u+rwx
+    force: yes
+  vars:
+    do_replay: no
+    use_snapshot: no
+    use_genesis_json: no
+
+- include: bootstrap/claims.yml
+  when: 
+  - setup_claims | bool
+  - not update_configs_only | bool
+
+- include: bootstrap/nginx.yml
+  when: 
+  - setup_nginx | bool
+  - not update_configs_only | bool
+  become: yes
+  become_user: root
+
+- include: bootstrap/oracle.yml
+  when: 
+  - setup_oracle | bool
+  - not update_configs_only | bool

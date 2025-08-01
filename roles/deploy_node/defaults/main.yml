@@ -1,0 +1,70 @@
+---
+plugins:
+  - eosio::chain_plugin
+  - eosio::chain_api_plugin
+  - eosio::net_plugin
+  - eosio::http_plugin
+chain_state_db_size_mb: 32096
+api_endpoint:
+do_replay:
+use_snapshot:
+use_genesis_json:
+enable_account_queries:
+setup_hyperion:
+setup_state_history:
+setup_nginx:
+setup_producer:
+setup_claims:
+setup_v1_history:
+service_name: nodeos
+wasm_runtime: eos-vm-jit
+eos_vm_oc_enable:
+max_clients: 100
+chain_threads: 2
+http_threads: 2
+net_threads: 2
+producer_threads: 2
+sync_fetch_span: 500
+max_transaction_time: 499
+read_only_read_window_time_us: 165000
+claims_hour: '*'
+claims_minute: '*'
+claims_api_url: http://127.0.0.1
+claims_api_port: 8282
+claim_permission: claims
+claim_account: eosio
+claim_action: claimrewards
+claims_private_key:
+es_conf_path: /etc/elasticsearch/elasticsearch.yml
+es_jvm_opts_path: /etc/elasticsearch/jvm.options
+es_override_path: /etc/systemd/system/elasticsearch.service.d/override.conf
+es_security_pack_enabled: false
+redis_conf_path: /etc/redis/redis.conf
+start_block: 0
+stop_block: 0
+hyperion_preview_mode: 'false'
+abi_cache_mode: 'false'
+fetch_block: 'true'
+fetch_traces: 'true'
+index_deltas: 'true'
+index_all_deltas: 'false'
+jvm_heap_size: 8g
+hyperion_readers: 1
+hyperion_deserializers: 1
+hyp_deserializer_threads: 1
+hyp_es_idx_queues: 1
+hyp_es_ad_idx_queues: 1
+http_max_response_time_ms: 100
+bp_fio_address:
+dl_block_log: no
+block_log_file:
+block_log_url:
+data_dir: deploy/data
+update_configs_only: no
+node_type: 
+is_failover: no
+pause_on_startup: false
+abi_serializer_max_time_ms: 20000
+database_map_mode: mapped
+release_name: leap
+vote_threads: 4

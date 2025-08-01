@@ -1,0 +1,87 @@
+---
+- name: Print variable value
+  debug: 
+      "msg={{ package }}"
+
+- name: Copying {{ package }} to host
+  copy:
+    src: "{{ name }}/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name not in ['eos', 'proton', 'telos', 'libre', 'ore']
+
+- name: Copying {{ package }} to host
+  copy:
+    src: "eos/{{ package }}"
+    dest: "{{ working_dir }}/dist/{{ package }}"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group }}"
+  when: bin_src == 'local' and name in ['eos', 'proton', 'telos', 'libre', 'ore']
+
+
+- name: Download {{ package }} to host
+  get_url:
+    url: '{{ bin_package_base_url }}/{{ version }}/{{ package }}'
+    dest: '{{ working_dir }}/dist/{{ package }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+  when: bin_src == 'remote'
+
+- name: Clean old package version
+  apt:
+    name: leap
+    state: absent
+  become: yes
+  become_user: root
+
+- name: Installing package
+  apt:
+    deb: '{{ working_dir }}/dist/{{ package }}'
+  become: yes
+  become_user: root
+
+- name: Preparing to version binaries
+  file:
+    path: '{{ working_dir }}/versions/{{ version }}/'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+  loop:
+    - '{{ nodeos_bin }}'
+    - '{{ cli_bin }}'
+    - '{{ keosd_bin }}'
+    - '{{ blocklog_bin }}'
+    - '{{ trace_api_bin }}'
+
+
+- name: Versioning binaries
+  copy:
+    remote_src: yes
+    src: '{{ pkg_install_path }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    mode: u+rwx
+  become: yes
+  become_user: root
+  loop:
+    - '{{ nodeos_bin }}'
+    - '{{ cli_bin }}'
+    - '{{ keosd_bin }}'
+    - '{{ trace_api_bin }}'
+
+- name: Versioning utility tool binaries
+  copy:
+    remote_src: yes
+    src: '{{ pkg_install_path }}/{{ item }}'
+    dest: '{{ working_dir}}/versions/{{ version }}/{{ item }}'
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+    mode: u+rwx
+  become: yes
+  become_user: root
+  loop:
+    - '{{ blocklog_bin }}'
+    - '{{ leap_util_bin }}'
+  ignore_errors: yes

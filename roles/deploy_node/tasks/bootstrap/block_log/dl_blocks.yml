@@ -1,0 +1,26 @@
+---
+- name: Register blocks URL
+  shell: echo {{ block_log_url }}/{{ block_log_file }}
+  args: 
+    executable: /bin/bash
+  register: dl_blocks_url
+
+- name: Create data directory
+  file:
+    path: '{{ working_dir }}/{{ data_dir }}'
+    state: directory
+    owner: '{{ deploy_user }}'
+    group: '{{ deploy_group }}'
+
+- name: Downloading latest {{ name }} block log
+  get_url:
+    url: '{{ dl_blocks_url.stdout }}'
+    dest: '{{ working_dir }}/backups/{{ block_log_file }}'
+    force: yes
+
+- name: Unarchiving block log tarball
+  unarchive:
+    src: '{{ working_dir }}/backups/{{ block_log_file }}'
+    dest: '{{ working_dir }}/{{ data_dir }}'
+    remote_src: yes
+

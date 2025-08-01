@@ -1,0 +1,14 @@
+#!/bin/bash
+MAINDIR={{ working_dir }}/deploy
+DATADIR=MAINDIR/data
+currdate=`date`
+lastprod=(`tail -n 1000 $DATADIR/stderr.txt | grep 'Received\|Produced' | grep quantumblok | tail -n 1| awk '{print $2}'`)
+diff=$(( $(date -d "$currdate" "+%s") - $(date -d "$lastprod" "+%s") ))
+if (( "$diff" < "200" )); then
+        printf "\n$currdate - "
+        curl -s http://127.0.0.1:8888/v1/producer/paused
+else
+        printf "\n$currdate - Resuming production - "
+        curl -s http://127.0.0.1:8888/v1/producer/resume
+	/usr/local/bin/telegram-send "🔥 Resumed production on backup node due to $lastprod being3 min from $currdate."
+fi

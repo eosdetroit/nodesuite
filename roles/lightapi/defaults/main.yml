@@ -1,0 +1,2 @@
+name: eos
+lightapi_ports: "5101 5102 5103 5104 5105"
