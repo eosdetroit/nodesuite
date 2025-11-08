@@ -6,5 +6,6 @@
 - name: Preparing apt package
   include_tasks: prebuilt/apt-package.yml
   when: apt_package | bool
-  become: yes
-  become_user: root
+  apply:
+    become: yes
+    become_user: root
