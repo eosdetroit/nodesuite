@@ -36,5 +36,5 @@
     state: restarted
     enabled: yes
 
-- include: nginx.yml
+- include_tasks: nginx.yml
   when: setup_nginx | bool

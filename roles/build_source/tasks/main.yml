@@ -4,8 +4,8 @@
     path: '{{ working_dir }}/versions/{{ version }}'
   register: has_version
 
-- include: prebuilt.yml
+- include_tasks: prebuilt.yml
   when: prebuilt | bool
 
-- include: build.yml
+- include_tasks: build.yml
   when: (has_version.stat.exists == False and not prebuilt | bool) or force_build | bool

@@ -2,7 +2,8 @@
 - name: Install build dependencies
   apt: 
     name:
-      - clang-8
+      - clang
+      - llvm
     state: latest
     update_cache: yes
   become: yes
@@ -30,7 +31,7 @@
   become_user: root
 
 - name: Apply patches
-  include: patch.yml
+  include_tasks: patch.yml
   when: apply_patch | bool
 
 - name: Running build script

@@ -5,5 +5,5 @@
   register: has_block_log_archive
 
 - name: Download blocks
-  include: dl_blocks.yml
+  include_tasks: dl_blocks.yml
   when: has_block_log_archive.stat.exists == False

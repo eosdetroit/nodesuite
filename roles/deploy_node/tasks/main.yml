@@ -55,12 +55,12 @@
     mode: u=rw
   when: setup_hyperion | bool
 
-- include: snapshot/{{ snapshot_provider }}.yml
+- include_tasks: snapshot/{{ snapshot_provider }}.yml
   when: 
     - use_snapshot | bool
     - not update_configs_only | bool
 
-- include: bootstrap/block_log/main.yml
+- include_tasks: bootstrap/block_log/main.yml
   when: 
     - dl_block_log | bool
     - not update_configs_only | bool
@@ -144,7 +144,7 @@
   become: yes
   become_user: root
 
-- include: genesis.yml
+- include_tasks: genesis.yml
   when: 
     - use_genesis_json | bool
     - not update_configs_only | bool
@@ -169,19 +169,19 @@
     use_snapshot: no
     use_genesis_json: no
 
-- include: bootstrap/claims.yml
+- include_tasks: bootstrap/claims.yml
   when: 
   - setup_claims | bool
   - not update_configs_only | bool
 
-- include: bootstrap/nginx.yml
+- include_tasks: bootstrap/nginx.yml
   when: 
   - setup_nginx | bool
   - not update_configs_only | bool
   become: yes
   become_user: root
 
-- include: bootstrap/oracle.yml
+- include_tasks: bootstrap/oracle.yml
   when: 
   - setup_oracle | bool
   - not update_configs_only | bool

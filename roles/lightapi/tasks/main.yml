@@ -14,7 +14,7 @@
 
 - name: add kitware repo
   apt_repository:
-    repo: deb https://apt.kitware.com/ubuntu/ bionic main
+    repo: deb https://apt.kitware.com/ubuntu/ noble main
     state: present
 
 - name: add ubuntu-toolchain repo
@@ -33,7 +33,6 @@
     - libssl-dev
     - libgmp-dev
     - zlib1g-dev
-    - python-dev
     - python3-dev
 
 - name: Update Alternative Links for gcc
@@ -134,4 +133,4 @@
     enabled: yes
     state: restarted
 
-- include: lightapi.yml
+- include_tasks: lightapi.yml
