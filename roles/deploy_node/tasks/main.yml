@@ -174,13 +174,14 @@
   - setup_claims | bool
   - not update_configs_only | bool
 
-- include_tasks: bootstrap/nginx.yml
+- include_tasks:
+    file: bootstrap/nginx.yml
+    apply:
+      become: yes
+      become_user: root
   when: 
   - setup_nginx | bool
   - not update_configs_only | bool
-  apply:
-    become: yes
-    become_user: root
 
 - include_tasks: bootstrap/oracle.yml
   when: 

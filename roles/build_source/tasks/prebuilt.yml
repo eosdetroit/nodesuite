@@ -4,8 +4,9 @@
   when: bin_package | bool
 
 - name: Preparing apt package
-  include_tasks: prebuilt/apt-package.yml
+  include_tasks:
+    file: prebuilt/apt-package.yml
+    apply:
+      become: yes
+      become_user: root
   when: apt_package | bool
-  apply:
-    become: yes
-    become_user: root
