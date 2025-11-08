@@ -1,55 +1,69 @@
-- name: Install aptitude
-  raw: apt-get -y install aptitude
-
-- name: upgrade packages
-  apt:
-    upgrade: yes
+- name: Update apt cache and upgrade packages
+  ansible.builtin.apt:
     update_cache: yes
+    cache_valid_time: 3600
+    upgrade: dist
+  become: yes
+
+- name: Ensure OpenSSH server is installed
+  ansible.builtin.apt:
+    name: openssh-server
+    state: present
+  become: yes
 
 - name: Make sure we have a 'wheel' group
-  group:
+  ansible.builtin.group:
     name: wheel
     state: present
+  become: yes
 
 - name: Allow wheel group to have passwordless sudo
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    regexp: '^%wheel'
-    line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/90-wheel-nopasswd
+    content: "%wheel ALL=(ALL) NOPASSWD: ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  become: yes
 
 - name: Create deploy user with sudo access.
-  user: 
-    name: '{{ deploy_user }}' 
-    groups: wheel 
+  ansible.builtin.user:
+    name: "{{ deploy_user }}"
+    groups: wheel
     append: yes
-    state: present 
+    state: present
     createhome: yes
     shell: /bin/bash
+  become: yes
 
-- name: Restart sshd
-  service:
-    name: sshd
+- name: Restart SSH
+  ansible.builtin.service:
+    name: ssh          
     enabled: yes
-    state: restarted
+    state: restarted  
+  become: yes
 
 - name: Create working directory
-  file:
-    path: '{{ working_dir }}'
+  ansible.builtin.file:
+    path: "{{ working_dir }}"
     state: directory
-    owner: '{{ deploy_user }}'
-    group: '{{ deploy_group }}'
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group | default(deploy_user) }}"
+    mode: "0755"
+  become: yes
 
 - name: Prepare block storage
-  include: prepare_block_storage.yml
-  when: setup_block_storage | bool
+  ansible.builtin.include_tasks: prepare_block_storage.yml
+  when: setup_block_storage | default(false) | bool
 
 - name: Create sub directories
-  file:
-    path: '{{ working_dir }}/{{ item }}'
+  ansible.builtin.file:
+    path: "{{ working_dir }}/{{ item }}"
     state: directory
-    owner: '{{ deploy_user }}'
-    group: '{{ deploy_group }}'
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_group | default(deploy_user) }}"
+    mode: "0755"
   loop:
     - src
     - deploy
@@ -59,7 +73,8 @@
     - vendor
     - dist
     - cron
+  become: yes
 
 - name: Tune CPU params
-  include: tune_cpu.yml
-  when: tune_cpu | bool
+  ansible.builtin.include_tasks: tune_cpu.yml
+  when: tune_cpu | default(false) | bool
